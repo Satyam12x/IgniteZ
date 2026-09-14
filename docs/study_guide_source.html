@@ -1,0 +1,429 @@
+<title>Green Fleet Optimizer Study Guide</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    color-scheme: light;
+    --ground: #f5f7f6; --surface: #ffffff; --surface-2: #eef2f0;
+    --ink: #14202b; --ink-2: #4a5866; --muted: #7c8791; --line: #dde3e1;
+    --accent: #1f6f8b; --accent-soft: #e3eff3;
+    --signal: #d9482b; --signal-soft: #fbe9e4;
+    --good: #168f65; --good-soft: #e2f3ec;
+    --term: #fff4d6; --term-line: #e6c15a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ground); color: var(--ink); font-family: "IBM Plex Sans", system-ui, sans-serif; font-size: 16px; line-height: 1.6; padding-block: 0 64px; padding-inline: 16px; }
+  h1, h2, h3, h4 { font-family: "Bitter", Georgia, serif; text-wrap: balance; line-height: 1.15; margin: 0; }
+  h1 { font-size: clamp(30px, 4.2vw, 44px); font-weight: 700; }
+  h2 { font-size: clamp(22px, 3vw, 30px); font-weight: 700; }
+  h3 { font-size: 19px; font-weight: 600; margin-top: 6px; }
+  h4 { font-size: 16px; font-weight: 600; font-family: "IBM Plex Sans", sans-serif; }
+  p, li { margin: 0; }
+  ul, ol { margin: 0; padding-left: 22px; }
+  li { margin-bottom: 6px; }
+  .eyebrow { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+  code, .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: .9em; }
+  code { background: var(--surface-2); padding: 1px 6px; border-radius: 4px; }
+  .shell { max-width: 900px; margin: 0 auto; }
+  .index { display: none; }
+  main { display: flex; flex-direction: column; gap: 44px; padding-top: 40px; }
+  .masthead { display: flex; flex-direction: column; gap: 12px; padding-bottom: 24px; border-bottom: 2px solid var(--ink); }
+  .masthead .lede { max-width: 72ch; font-size: 17px; color: var(--ink-2); }
+  section { display: flex; flex-direction: column; gap: 18px; }
+  .section-head { display: flex; flex-direction: column; gap: 6px; }
+  .prose { max-width: 74ch; display: flex; flex-direction: column; gap: 12px; }
+  .term { background: var(--term); border-bottom: 2px solid var(--term-line); padding: 0 3px; border-radius: 2px; font-weight: 600; }
+  .def { border-left: 4px solid var(--term-line); background: var(--term); padding: 10px 14px; border-radius: 0 6px 6px 0; max-width: 74ch; font-size: 15px; }
+  .def b { font-family: "Bitter", serif; }
+  .why { border-left: 4px solid var(--accent); background: var(--accent-soft); padding: 12px 16px; border-radius: 0 6px 6px 0; max-width: 74ch; }
+  .why b { font-family: "Bitter", serif; }
+  .warn { border-left: 4px solid var(--signal); background: var(--signal-soft); padding: 12px 16px; border-radius: 0 6px 6px 0; max-width: 74ch; }
+  .good { border-left: 4px solid var(--good); background: var(--good-soft); padding: 12px 16px; border-radius: 0 6px 6px 0; max-width: 74ch; }
+  .steps { display: flex; flex-direction: column; gap: 10px; counter-reset: step; }
+  .step { display: grid; grid-template-columns: 44px 1fr; gap: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; }
+  .step::before { counter-increment: step; content: counter(step); font-family: "Bitter", serif; font-size: 22px; font-weight: 700; color: var(--accent); line-height: 1; }
+  .step h4 { margin-bottom: 4px; }
+  .step p { font-size: 15px; color: var(--ink-2); }
+  figure { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+  figure img { width: 100%; max-width: 100%; height: auto; display: block; }
+  figcaption { font-size: 14px; color: var(--ink-2); }
+  .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+  th, td { padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-weight: 600; color: var(--ink-2); font-size: 12.5px; letter-spacing: .04em; text-transform: uppercase; background: var(--surface-2); }
+  tr:last-child td { border-bottom: none; }
+  .gloss { display: grid; grid-template-columns: 1fr; gap: 8px; }
+  .gloss div { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 8px 12px; font-size: 14.5px; }
+  .gloss b { font-family: "Bitter", serif; }
+  .role { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; }
+  .foot { color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); padding-top: 18px; }
+</style>
+
+<div class="shell">
+<main>
+
+<header class="masthead">
+  <span class="eyebrow">Smart India Hackathon 2026 · SIH26138 · Team study guide</span>
+  <h1>Green Fleet Optimizer — Understanding Our Project</h1>
+  <p class="lede">This document explains the whole project in plain language: what we built, why each part exists, how the parts connect, what tools we used and why, and what our results mean. Every technical word is explained the first time it appears (highlighted <span class="term">like this</span>), and there is a full glossary at the end. Read it once end-to-end before the presentation; then use the glossary and the "how to answer" section for revision.</p>
+</header>
+
+<!-- ========================================================= -->
+<section id="lead">
+  <div class="section-head"><span class="eyebrow">Part 1</span><h2>The big picture, in five minutes</h2></div>
+  <div class="prose">
+    <h3>What problem are we solving?</h3>
+    <p>Ships carry most of the world's goods. India moves about 95% of its trade by volume through its ports. Ships burn a heavy, dirty fuel, which creates two problems at once: it is expensive, and it produces greenhouse gases that warm the planet.</p>
+    <p>Governments now want ships to switch to cleaner fuels — <span class="term">LNG</span> (liquefied natural gas, natural gas cooled to a liquid), <span class="term">methanol</span> (a liquid alcohol fuel), <span class="term">hydrogen</span>, and <span class="term">ammonia</span> (a nitrogen-hydrogen compound that burns without releasing carbon dioxide) — or to plug into the electricity grid while docked (called <span class="term">shore power</span>).</p>
+    <p>India has its own targets. The <span class="term">Harit Sagar</span> guidelines ("Green Ocean" in Hindi) say ports must cut pollution per tonne of cargo by 30% by 2030 and 70% by 2047. The <span class="term">Green Tug Transition Programme (GTTP)</span> is replacing diesel harbour tugboats with electric or clean-fuel ones.</p>
+    <p>But here is the hard part. A port or shipping company must answer many questions <em>at the same time</em>: which ships to use, how fast to sail them, which fuel each should burn, whether cargo still arrives on time, whether the fuel is even available at that port, and whether the pollution rules are met. Every answer changes the others. With just 20 ships, 4 fuels and 5 speed settings, there are more combinations than anyone could ever check by hand.</p>
+  </div>
+  <div class="why"><b>Why this matters to a judge:</b> The problem is real, Indian, and current. There is a live government programme (GTTP), a live target (Harit Sagar), and a live pilot (our problem-statement sponsor signed an agreement with Mormugao Port in July 2026). We are not inventing a need.</div>
+  <div class="prose">
+    <h3>What does our software do?</h3>
+    <p>It has two "engines":</p>
+    <ol>
+      <li><strong>A fuel predictor.</strong> Given a ship, a speed and a load, it predicts how much energy the ship will need. It learned this from 26,000 real ships.</li>
+      <li><strong>A fleet planner (the optimizer).</strong> It searches through millions of possible plans — which ships, which fuels, which speeds — and returns the best trade-offs between cost, fuel and pollution, while obeying every rule.</li>
+    </ol>
+    <p>Between the two sits an <strong>emissions engine</strong> that counts pollution honestly (more on this below — it is our biggest advantage), and an <strong>India layer</strong> that knows which fuels are available at which Indian ports in which years.</p>
+    <h3>Why "quantum-inspired"?</h3>
+    <p>The problem statement requires it. But be very clear about what it means:</p>
+  </div>
+  <div class="def"><b>Quantum-inspired</b> means a normal computer program that <em>borrows ideas</em> from quantum physics to search smarter. It is <strong>not</strong> a quantum computer. It runs on an ordinary laptop. We never claim a "quantum speedup". If a judge asks "is this real quantum computing?", the answer is a clear <strong>no</strong>, followed by what it actually is.</div>
+  <div class="prose">
+    <p>The idea it borrows: in a normal search, each choice is either yes or no. In our search, each choice starts as a <em>probability</em> — "60% chance this ship uses methanol". The search keeps many possibilities open at once (like a quantum bit that is in a mix of states), and slowly nudges the probabilities toward choices that turn out to be good. This helps it explore widely early on and avoid getting stuck on a "good but not best" answer.</p>
+    <h3>Why is ours better than existing tools?</h3>
+    <p>Companies like ZeroNorth and Wärtsilä sell software that helps <strong>one ship on one voyage</strong> — best route, best speed. Good tools. But they do not decide <em>which ships to buy</em> or <em>which fuels to commit to</em> — and that is the decision a port under GTTP actually faces. Also, they count only the pollution that comes out of the ship's funnel. We count the whole life of the fuel, and that changes the answer completely (Part 3 explains how).</p>
+  </div>
+</section>
+
+<!-- ========================================================= -->
+<section id="flow">
+  <div class="section-head"><span class="eyebrow">Part 2</span><h2>The flow — how the project works, step by step</h2></div>
+  <figure>
+    <img src="charts/14_architecture.png" alt="Architecture: data, fuel predictor, well-to-wake, India layer, optimizer, decision support">
+    <figcaption>Data flows left to right: real ship data → fuel predictor → emissions engine → Indian port rules → the optimizer → the decision-support screen. Each box is explained below.</figcaption>
+  </figure>
+  <div class="steps">
+    <div class="step"><div><h4>Get real data</h4><p>We download eight years (2018–2025) of real ship fuel records from the European Union's official database. Every ship over 5,000 tonnes calling at a European port must report its fuel use and CO₂ by law, and an independent auditor checks it. This is 106,922 ship-years from 25,967 real, named ships. <strong>Nothing is made up.</strong></p></div></div>
+    <div class="step"><div><h4>Clean the data</h4><p>Real data is messy. We found ships reporting 603 million hours at sea (68,000 years — a typo), pollution levels physically impossible for any fuel, and the literal text "Division by zero!" in official EU spreadsheets. Twelve automatic checks catch these. We never silently delete or guess — every problem row is flagged and counted.</p></div></div>
+    <div class="step"><div><h4>Predict fuel use</h4><p>We combine a physics law (fuel rises roughly with the <em>cube</em> of speed) with machine learning (which learns each ship's individual efficiency from its design). Result: on 6,263 ships the model had never seen, it predicts energy within 19.9% on average.</p></div></div>
+    <div class="step"><div><h4>Count emissions honestly</h4><p>We add up pollution from making the fuel, transporting it, and burning it — including two gases most tools ignore (methane and nitrous oxide). This is called "well-to-wake". It flips the verdict on three fuels.</p></div></div>
+    <div class="step"><div><h4>Apply India's rules</h4><p>Which fuels can be bought at Mumbai, Mormugao, Cochin in 2030? Is shore power installed? How dirty is India's electricity? Are we on track for Harit Sagar? All of this is data the optimizer must obey.</p></div></div>
+    <div class="step"><div><h4>Optimize the fleet</h4><p>The quantum-inspired search explores the millions of combinations and returns not one answer but a <em>set</em> of best trade-offs — "cheapest plan", "cleanest plan", and every sensible option between.</p></div></div>
+    <div class="step"><div><h4>Prove it works</h4><p>We compare against standard methods on the same problem with the same budget, 30 times each with different random starts, and use a statistical test to check the difference is real. On tiny problems we compute the exact best answer by brute force and check we find it.</p></div></div>
+    <div class="step"><div><h4>Show it (next phase)</h4><p>A dashboard where a port officer can enter their fleet, try "what if" scenarios (fuel price shock, carbon tax, hydrogen becomes available in 2030), see the trade-offs on a chart, and download a report.</p></div></div>
+  </div>
+</section>
+
+<!-- ========================================================= -->
+<section id="data">
+  <div class="section-head"><span class="eyebrow">Part 3 · Component 1</span><h2>The data: where it comes from and why it matters</h2></div>
+  <div class="def"><b>EU MRV</b> = European Union Monitoring, Reporting and Verification. A law (since 2018) that makes every large ship visiting Europe report its yearly fuel consumption and CO₂. The reports are checked by an accredited verifier, then published by <b>EMSA</b> (the European Maritime Safety Agency). We downloaded them from EMSA's public system called <b>THETIS-MRV</b>.</div>
+  <div class="prose">
+    <h3>Why real data instead of made-up data?</h3>
+    <p>Because judges will ask "where does your data come from?", and "we simulated it" is the weakest possible answer. Ours is: <em>"106,922 verified regulatory filings from 25,967 real ships, 2018 to 2025, downloaded from EMSA's public API."</em> No competitor team is likely to have this.</p>
+    <h3>What is in it?</h3>
+    <p>For each ship, each year: total fuel burned, total CO₂, hours at sea, fuel per nautical mile, fuel per tonne of cargo moved, the ship type, and a "design efficiency" number from the ship's certificate. From 2024 onwards it also includes <strong>measured methane and nitrous oxide</strong> — which turned out to be extremely valuable (see Component 3).</p>
+    <h3>Two honest limits of this data</h3>
+    <ul>
+      <li><strong>No tugboats.</strong> The law only covers ships over 5,000 <span class="term">GT</span> (gross tonnage, a measure of a ship's size). A harbour tug is 200–500 GT. So no tug appears in our training data. For tugs we use physics and published tug specifications, and we <em>label</em> those numbers as physics-derived, not data-derived. Say this before a judge finds it.</li>
+      <li><strong>Yearly totals, not voyage-by-voyage.</strong> We know a ship's total fuel for a year, not its fuel on each trip. This leads to the "circularity trap" below.</li>
+    </ul>
+    <h3>Provenance: why we record file versions</h3>
+    <p>EMSA re-publishes a year's file every time a company corrects a filing (the 2024 file is at version 242). We record the exact version and a <span class="term">SHA-256</span> (a digital fingerprint of the file) so anyone can reproduce our exact result later. Judges who work in research respect this.</p>
+  </div>
+  <div class="warn"><b>The circularity trap — our most important early discovery.</b> We wanted to learn from the data how fuel changes with speed. But in MRV data, "speed" and "fuel per mile" are both <em>calculated from the same column</em>. Fitting one against the other is partly fitting a number against itself. We proved this mathematically (the two are linked by an exact identity, error 5×10⁻¹⁶) and confirmed it experimentally: the fitted speed exponent came out near 1 instead of the physical value 3. A team that missed this would build an optimizer that underestimates the benefit of slowing down by roughly 3× — and slowing down is the single biggest fuel-saving lever there is. We fixed it by taking the speed law from physics (see Component 2) instead of trying to learn it from data that cannot teach it.</div>
+</section>
+
+<!-- ========================================================= -->
+<section id="predictor">
+  <div class="section-head"><span class="eyebrow">Part 3 · Component 2</span><h2>The fuel predictor: physics plus machine learning</h2></div>
+  <div class="prose">
+    <h3>The physics part (the "shape")</h3>
+    <p>Naval architects have known for a century that the power a ship needs rises with the <strong>cube of its speed</strong>. Slow down from 14 to 12 knots and the engine needs about 37% less power per hour. Because the trip takes longer, fuel per trip drops by about 27%. This is well established, so we <em>impose</em> it in the model rather than trying to re-learn it from data that cannot teach it.</p>
+  </div>
+  <div class="def"><b>Knot</b> = one nautical mile per hour, about 1.85 km/h. <b>Nautical mile (nmi)</b> = 1,852 metres. Ships use these units, so we do too.</div>
+  <div class="prose">
+    <p>We also separate two kinds of power: <strong>propulsion</strong> (moving the ship, scales with speed³) and <strong>hotel load</strong> (lights, air-conditioning, refrigeration, pumps — roughly constant whatever the speed). This separation matters: a cruise ship's hotel load is huge, so slowing it down saves almost nothing per mile, while a bulk carrier saves a lot. Our model captures that; a simple "cube law" tool cannot.</p>
+    <h3>The machine-learning part (the "level")</h3>
+    <p>Physics tells us the <em>shape</em> of the curve; it does not tell us how efficient one particular ship is. That is what the machine learning learns — from the ship's type, its design-efficiency certificate, whether it is ice-strengthened, and so on.</p>
+  </div>
+  <div class="def"><b>XGBoost</b> = a widely used machine-learning method that builds many small decision trees and adds them up. It is fast, accurate on tabular data, and — importantly for us — can be told "this input must only ever push the answer in one direction", which we use to keep the physics honest. That is called a <b>monotone constraint</b>.</div>
+  <div class="prose">
+    <h3>Why we predict energy, not fuel</h3>
+    <p>Methanol carries only about half the energy per kilogram that diesel does. If the model predicted "tonnes of fuel", it would be wrong the moment you changed fuel. So it predicts <strong>energy in megajoules (MJ)</strong>, and a separate table converts that to tonnes for each fuel using each fuel's energy content (called <span class="term">LHV</span>, lower heating value — the energy released per kilogram burned).</p>
+    <h3>How we tested it honestly</h3>
+  </div>
+  <div class="def"><b>Leakage</b> = the most common silent mistake in this kind of project. If the same ship appears in both the training data and the test data, the model just "remembers" it and the accuracy looks fantastic but is fake. We split by <em>whole ships</em> — 25% of ships are held back entirely — and we check by code that no ship appears on both sides. We also test on <em>future years</em> the model never saw.</div>
+  <div class="def"><b>MAPE</b> = Mean Absolute Percentage Error. If the ship really used 100 units and we predicted 120, that is a 20% error. MAPE is the average of those percentages. Lower is better. <b>R²</b> ("R squared") = how much of the variation between ships the model explains, from 0 (nothing) to 1 (everything).</div>
+  <figure>
+    <img src="charts/05_model_accuracy.png" alt="Model accuracy versus baselines">
+    <figcaption>On 6,263 ships never seen in training: our physics + XGBoost model reaches 19.9% MAPE, R² 0.603. A naive guess (the average for that ship type) gets 32.6%.</figcaption>
+  </figure>
+  <div class="prose">
+    <h3>"The model knows what it doesn't know" — the cold-start path</h3>
+    <p>Some ships have no design certificate (most offshore vessels, and all tugs). Instead of guessing confidently, the model flags these as <span class="term">cold-start</span> (a ship we have almost nothing on), gives a physics-based estimate, and <em>widens the uncertainty band</em>. We report warm and cold ships separately: warm 19.3% error, cold 41.8% — and the cold band covers the truth 84% of the time, as it should.</p>
+  </div>
+  <div class="def"><b>P10 / P50 / P90</b> = instead of one number, we give three: a low estimate (10% chance the truth is below it), a middle estimate, and a high one (10% chance the truth is above). The band between P10 and P90 should contain the truth about 80% of the time. Ours contains it 80.0% of the time on unseen ships — that means the uncertainty is <em>honest</em>, and the planner can safely use the conservative end.</div>
+  <div class="why"><b>Why judges will care:</b> "How accurate is it?" has a defensible answer with a leakage-safe split. "What about ships with no data?" has a built-in answer (cold-start). "Does slowing down really save fuel?" — the physics is imposed, so the answer is always right by construction.</div>
+</section>
+
+<!-- ========================================================= -->
+<section id="emissions">
+  <div class="section-head"><span class="eyebrow">Part 3 · Component 3</span><h2>The emissions engine: counting the whole life of the fuel</h2></div>
+  <div class="def"><b>Well-to-wake</b> = the full lifecycle of a marine fuel. <b>"Well-to-tank"</b> is everything before the ship: extracting or making the fuel, refining it, shipping it to the port. <b>"Tank-to-wake"</b> is burning it on board. (The "wake" is the trail behind a ship.) Most tools count only tank-to-wake — what comes out of the funnel.</div>
+  <div class="prose">
+    <h3>Why this is our biggest advantage</h3>
+    <p>Ammonia contains no carbon, so burning it releases no CO₂. A funnel-only tool therefore scores ammonia as a perfect, zero-emission fuel. But <em>making</em> ammonia from natural gas (the usual way, called <span class="term">grey</span> ammonia) releases so much CO₂ upstream that grey ammonia is <strong>40% worse than diesel</strong> over its whole life. Made with renewable electricity instead (<span class="term">green</span> ammonia), it is 79% better. Same molecule, opposite verdict — the <em>pathway</em> is everything.</p>
+  </div>
+  <figure>
+    <img src="charts/01_stack_vs_lifecycle.png" alt="Stack-only versus lifecycle emissions per fuel">
+    <figcaption>Grey bars: what a funnel-only tool reports. Blue/red bars: the truth. Three fuels flip from "improvement" to "worse than diesel". A port buying on the grey bars would increase pollution while reporting it had reached zero.</figcaption>
+  </figure>
+  <div class="prose">
+    <h3>The two gases most tools forget</h3>
+  </div>
+  <div class="def"><b>Methane slip</b> = LNG is mostly methane. Some of it passes through the engine unburnt and escapes. Methane traps about 28–30 times more heat than CO₂ over a century, so even 1–3% escaping erases most of LNG's advantage. <b>N₂O (nitrous oxide)</b> = a gas formed when ammonia burns; it traps about 265–273 times more heat than CO₂.</div>
+  <div class="def"><b>GWP</b> = Global Warming Potential. A multiplier that converts a gas into "CO₂-equivalent" (written <b>CO₂e</b>) so different gases can be added up. It depends on the time horizon (we use 100 years, "GWP100") and on which scientific report you take it from (IPCC AR5 or AR6). We state which one we use every time — and we discovered, by solving equations on 28,125 real filings, that the EU uses the AR5 numbers (CH₄ = 28, N₂O = 265), exact to 14 decimal places.</div>
+  <div class="prose">
+    <h3>We measured methane slip instead of assuming it</h3>
+    <p>The official European default for methane slip is 3.1%. We had real measured methane from 745 LNG carrier ship-years in the 2024–25 data. The real median is <strong>1.72%</strong> — about half. And the two numbers disagree on the sign: with the default, LNG is 5.5% <em>worse</em> than diesel; with the measured value it is 3.9% <em>better</em>. Being able to say "our methane number is measured from 745 real ships, not a default" is a direct answer to "isn't LNG a clean fuel?"</p>
+  </div>
+  <figure>
+    <img src="charts/02_methane_slip.png" alt="Methane slip: assumed versus measured">
+    <figcaption>Left: the regulatory default (3.1%) versus what the real fleet actually does (1.72%). Right: what that does to LNG's verdict versus diesel.</figcaption>
+  </figure>
+  <div class="prose">
+    <h3>Pilot fuel</h3>
+    <p>Engines that burn methanol or ammonia need a small squirt of diesel to ignite each stroke (called <span class="term">pilot fuel</span>, 4–7% of the energy). We count it. Without it, "green ammonia" looks cleaner than it is.</p>
+    <h3>A bug we caught that would have sunk the pitch</h3>
+  </div>
+  <div class="warn"><b>Shaft energy vs input energy.</b> Our first version showed electric tugs as 146% <em>worse</em> than diesel. That was wrong. A marine diesel turns only about 45% of its fuel energy into useful work at the propeller; an electric motor turns about 92% of its electricity into work. Comparing on "energy in" instead of "work out" punishes the battery by a factor of two. We now compare everything on <b>shaft energy</b> (work delivered at the propeller shaft). The Green Tug Transition Programme is <em>the</em> flagship Indian programme this project targets; a tool that told ports not to electrify because of a units mistake would have been fatal. We show this bug and its fix openly — it demonstrates rigour.</div>
+  <div class="prose">
+    <h3>Local pollution is not the same as climate pollution</h3>
+    <p>CO₂ warms the planet but does not hurt your lungs. <span class="term">NOx</span> (nitrogen oxides), <span class="term">SOx</span> (sulphur oxides) and <span class="term">PM</span> (particulate matter, soot) do not warm the planet much but cause asthma and heart disease in port cities. We track them <em>separately</em> and never add them into the CO₂e total (that would be like adding kilograms to kilometres). This matters for the electrification story below.</p>
+  </div>
+</section>
+
+<!-- ========================================================= -->
+<section id="india">
+  <div class="section-head"><span class="eyebrow">Part 3 · Component 4</span><h2>The India layer: rules the optimizer must obey</h2></div>
+  <div class="prose">
+    <p>A clean fuel is useless if you cannot buy it at the port. We built a data file describing eight major Indian ports (Mormugao, Deendayal, Paradip, V.O. Chidambaranar, JNPA, Visakhapatnam, Cochin, Mumbai): which fuels can be bunkered there, in which year, whether shore power is installed, and how dirty the electricity is.</p>
+  </div>
+  <div class="def"><b>Bunkering</b> = refuelling a ship. <b>Shore power</b> (also "cold ironing" or OPS, onshore power supply) = plugging a docked ship into the grid so it can switch off its engines. <b>CEA</b> = Central Electricity Authority, which publishes how much CO₂ India's grid emits per unit of electricity. <b>T&amp;D losses</b> = electricity lost in transmission and distribution wires before it reaches the ship (about 17% in India), which we add on top.</div>
+  <div class="prose">
+    <h3>Three rules we enforce</h3>
+    <ul>
+      <li><strong>A fuel must be available at <em>every</em> port on the route.</strong> One gap strands the ship. And "planned" does <em>not</em> count — planning a fleet around infrastructure that is only announced is exactly the mistake this prevents.</li>
+      <li><strong>Shore power needs both the port and the ship to be equipped.</strong> Either missing means the ship runs its own engines at the dock.</li>
+      <li><strong>Shore power is only as clean as the grid.</strong> India's grid is coal-heavy, so this is a real number, not zero — and it improves every year.</li>
+    </ul>
+    <h3>The honest electrification answer</h3>
+    <p>Against a 45%-efficient marine diesel, India's current grid is not clean enough: a battery-electric tug emits <strong>20% more CO₂</strong> in 2030 and only crosses over to better in <strong>2035</strong>. That sounds like bad news for GTTP — until you add the other half:</p>
+  </div>
+  <div class="good"><b>Each electrified tug removes 35.6 tonnes of NOx, 1.25 tonnes of SOx and 187 kg of soot from the port city every year, from day one.</b> So the recommendation is: electrify now for public health; the carbon benefit arrives around 2035 as the grid decarbonises. This is specific, uncomfortable, and obviously not sales copy — which is why it makes a government audience trust everything else we say.</div>
+  <figure>
+    <img src="charts/03_electrification_crossover.png" alt="Electric versus diesel on the Indian grid by year">
+    <figcaption>Blue line: an electric tug on India's grid. Dashed line: diesel. They cross in 2035. The red region is where electric is worse on carbon (but still zero local pollution).</figcaption>
+  </figure>
+  <div class="prose">
+    <h3>Tank size and range — why hydrogen is a tug fuel</h3>
+    <p>Hydrogen carries very little energy per litre once you include the heavy insulated tank it needs. If you keep a ship's diesel tank and switch it to hydrogen, its range drops to <strong>7%</strong> of what it was. That is why hydrogen suits harbour tugs and ferries (short trips) but not long-haul ships. The optimizer knows this and will refuse to assign hydrogen to a route it cannot complete. Low-density fuels also eat cargo space: a purpose-built hydrogen tank for a 5,000-mile route displaces 4,842 tonnes of cargo.</p>
+    <h3>Harit Sagar tracking</h3>
+    <p>The target is pollution <em>per tonne of cargo</em>, −30% by 2030 and −70% by 2047 from a baseline. Our tracker draws the required glide path between those years and tells a port whether any plan is on or off track. In our example, a port switching 35% of its fuel to e-methanol by 2030 is on track.</p>
+  </div>
+</section>
+
+<!-- ========================================================= -->
+<section id="optimizer">
+  <div class="section-head"><span class="eyebrow">Part 3 · Component 5</span><h2>The optimizer: the quantum-inspired part</h2></div>
+  <div class="prose">
+    <h3>The problem, stated simply</h3>
+    <p>For every candidate ship, decide four things: <strong>use it or not</strong>, <strong>which route</strong>, <strong>which fuel</strong>, and <strong>what speed</strong>. Choose so that fuel, pollution and cost are all as low as possible, while every rule is obeyed: all cargo delivered, schedules met, pollution cap respected, fuel available, range sufficient, ship fits the port.</p>
+    <p>The first three decisions are "pick one from a list" (called <span class="term">discrete</span>). Speed is a smooth number, any value between the engine's minimum and maximum (called <span class="term">continuous</span>). Handling both together is the tricky part, and we use two quantum-inspired methods, one for each.</p>
+    <h3>Q-bits for the discrete choices</h3>
+  </div>
+  <div class="def"><b>Q-bit</b> = our representation of one yes/no decision. Instead of storing "yes" or "no", it stores a <em>probability</em> of yes (technically a pair of numbers called amplitudes whose squares add to 1, exactly like a quantum bit). "Use this ship?" starts at 50/50. <b>Observation</b> = rolling the dice to turn every Q-bit into a concrete yes/no, giving one complete plan we can score. <b>Rotation gate</b> = after scoring, we nudge each Q-bit's probability toward the value it has in the best plan found so far — but only where the current plan disagreed with a better one. Small nudges, many rounds. This is the "quantum update mechanism" the problem statement asks for.</div>
+  <div class="prose">
+    <p>Choosing a route from, say, 6 options takes 3 Q-bits (binary code). We decode the 3 bits "modulo 6" so that <em>every</em> possible bit pattern maps to a real route — no wasted, invalid answers. For 60 ships, 6 routes and 4 fuels that is 360 Q-bits.</p>
+    <h3>QPSO for the continuous speeds</h3>
+  </div>
+  <div class="def"><b>QPSO</b> = Quantum-behaved Particle Swarm Optimization. Imagine a swarm of bees, each holding a guess at all the ships' speeds. In ordinary "particle swarm" methods each bee flies with a velocity toward the best spots. In QPSO there is no velocity: each bee's next position is <em>sampled from a probability cloud</em> around the best spots — derived from the maths of a quantum particle in a potential well. A bee can occasionally "tunnel" far away, which stops the swarm getting stuck.</div>
+  <div class="prose">
+    <h3>Why not one best answer? The Pareto front</h3>
+  </div>
+  <div class="def"><b>Pareto front</b> = the set of plans where you cannot improve one thing without worsening another. The cheapest plan is dirtier; the cleanest plan is dearer; between them are plans that trade a bit of one for a bit of the other. We return the whole set and let the decision-maker choose. A single "best" number would hide the trade-off they are actually being asked to make.</div>
+  <figure>
+    <img src="charts/12_pareto_front.png" alt="A Pareto front of 14 fleet plans">
+    <figcaption>Fourteen feasible plans for a 12-ship coastal fleet in 2047. Bottom-left is impossible (that would be cheap AND clean). The front runs from "all fossil, ₹51 crore, 14,500 t CO₂e" to "100% e-methanol, ₹74 crore, 1,400 t" — a 91% cut for 45% more cost, with real mixed-fuel plans between.</figcaption>
+  </figure>
+  <div class="prose">
+    <h3>How we handle rules (constraints)</h3>
+    <p>A plan that drops cargo is not a "cheaper plan" — it is not a plan. So a feasible plan always beats an infeasible one, no matter the score. If the demand is genuinely impossible for the fleet, the tool <em>refuses</em> and says by how much: "demand 1,000,000 t exceeds the fleet's best case 700,000 t, short by 300,000 t". It never silently returns a broken answer.</p>
+    <h3>A design fix we made, and what we learned</h3>
+    <p>Our first version had every bee follow the <em>same</em> leader each round, which pulled the whole swarm into one corner and gave a thin Pareto front. Giving each bee its own leader (chosen from a sparse region of the front) tripled the number of plans found. Second, the rotation-gate step size we had tuned on a small problem was far too slow for a 360-Q-bit problem; we made it scale with problem size, and recorded the failed intermediate attempt too. Both are in the findings documents.</p>
+  </div>
+</section>
+
+<!-- ========================================================= -->
+<section id="proof">
+  <div class="section-head"><span class="eyebrow">Part 3 · Component 6</span><h2>Proving it works: benchmarking honestly</h2></div>
+  <div class="prose">
+    <p>The problem statement's sponsor is a quantum company. They will probe any hype. So we compare our optimizer against standard methods under strictly fair conditions and <strong>publish the cases where we don't win</strong>.</p>
+    <h3>The three levels of proof</h3>
+  </div>
+  <div class="steps">
+    <div class="step"><div><h4>Exact answer on a tiny problem</h4><p>For a 2-ship problem we compute the true best answer by <span class="term">MILP</span> (mixed-integer linear programming — an exact mathematical solver that proves it has found the optimum). Our optimizer must find that same answer. It does: <strong>30 out of 30 random starts, 0.0000% gap</strong>. A method that fails a trivial case cannot be trusted on a big one.</p></div></div>
+    <div class="step"><div><h4>Fair comparison on realistic problems</h4><p>Against <span class="term">NSGA-II</span> (the standard genetic algorithm for multi-objective problems), a greedy heuristic (what a planner would do in a spreadsheet), and random search. Every method gets the <em>same number of evaluations</em> (6,000). Every method is run 30 times with different random seeds. We measure <span class="term">hypervolume</span> (how much of the trade-off space the front covers — bigger is better) against one shared reference point, and use the <span class="term">Wilcoxon test</span> (a statistical test for "is this difference real or luck?") paired by seed.</p></div></div>
+    <div class="step"><div><h4>Scaling</h4><p>Does it still work at 200 ships? Yes — 200 vessels, 10²⁷⁹ combinations, a feasible plan in 54 seconds, every run.</p></div></div>
+  </div>
+  <figure>
+    <img src="charts/09_optimizer_benchmark.png" alt="Optimizer benchmark against baselines">
+    <figcaption>Left, 12 ships: our method and NSGA-II are statistically tied (p = 0.14 — say "tie", not "win"). Right, 60 ships: ours beats every method with p ≤ 0.004. The advantage appears when the problem is large — exactly what the theory predicts.</figcaption>
+  </figure>
+  <div class="def"><b>p-value</b> = the probability that a difference this big would appear by luck if there were really no difference. Below 0.05 is conventionally "significant". p = 0.004 means about a 1-in-250 chance of luck. p = 0.14 means we cannot claim a real difference — so we call it a tie.</div>
+  <div class="good"><b>The honest pattern across everything we tested:</b> on small or smooth problems (tuning XGBoost settings, choosing 10 features, a 12-ship fleet) the quantum-inspired method <em>ties</em> conventional methods. On large, rugged problems (a 4,096-state knapsack, a 60-ship fleet, a multimodal maths benchmark) it <em>wins clearly</em>. That is a narrow, defensible claim. "It always wins" would be false and a quantum-expert judge would know it.</div>
+  <div class="prose">
+    <h3>"Quantum-ready" — what QUBO means</h3>
+  </div>
+  <div class="def"><b>QUBO</b> = Quadratic Unconstrained Binary Optimization. A standard mathematical form (minimise x·Q·x over 0/1 variables) that real quantum annealers — like D-Wave machines — consume directly. We wrote the fleet problem in this form and verified that its lowest-energy state <em>exactly</em> matches the exact MILP answer. That means the same problem could run on quantum hardware when India's National Quantum Mission makes it available — without reformulation. We have <strong>not</strong> run it on a quantum device, and we say so.</div>
+</section>
+
+<!-- ========================================================= -->
+<section id="tools">
+  <div class="section-head"><span class="eyebrow">Part 4</span><h2>The tools we use, and why each one</h2></div>
+  <div class="table-wrap"><table>
+    <tr><th>Tool</th><th>What it is</th><th>Why we chose it</th></tr>
+    <tr><td><strong>Python 3.10</strong></td><td>The programming language</td><td>The standard for data science and optimization; every library below is Python-first</td></tr>
+    <tr><td><strong>NumPy</strong></td><td>Fast numerical arrays</td><td>Our quantum-inspired algorithms are written directly in NumPy so we control every line — no black box</td></tr>
+    <tr><td><strong>pandas</strong></td><td>Tables and data cleaning</td><td>Reading 106,922 rows across 8 Excel files with changing column names</td></tr>
+    <tr><td><strong>scikit-learn</strong></td><td>Machine-learning toolkit</td><td>Leakage-safe data splitting (grouped by ship) and baseline models</td></tr>
+    <tr><td><strong>XGBoost</strong></td><td>Gradient-boosted trees</td><td>Best accuracy on tabular data, and supports monotone constraints that keep physics honest</td></tr>
+    <tr><td><strong>pymoo</strong></td><td>Multi-objective optimization library</td><td>Gives us NSGA-II, the standard baseline we must beat, implemented by its own authors — no accusation of a weak baseline</td></tr>
+    <tr><td><strong>OR-Tools CP-SAT</strong></td><td>Google's exact solver</td><td>Proves the true optimum on small problems so we can verify our method (Q-08 in the test register)</td></tr>
+    <tr><td><strong>SciPy</strong></td><td>Scientific statistics</td><td>The Wilcoxon signed-rank test for "is the difference real?"</td></tr>
+    <tr><td><strong>YAML config files</strong></td><td>Human-readable settings</td><td>Every emission factor and every port's fuel availability lives in a config file, tagged with its source and confidence — never hard-coded. Change one number, every result updates.</td></tr>
+    <tr><td><strong>pytest</strong></td><td>Automated testing</td><td>399 tests, each mapped to an edge case in our test register (e.g. "P-02: fuel must rise with speed"). Judges can be told "every claim on this slide is asserted by a test."</td></tr>
+    <tr><td><strong>ruff, uv</strong></td><td>Code linter and package manager</td><td>Keeps code clean and the environment reproducible on any machine</td></tr>
+    <tr><td><strong>matplotlib</strong></td><td>Charts</td><td>All 14 charts are generated from the result files by a script, so a chart cannot show a number the code did not produce</td></tr>
+    <tr><td><em>Planned:</em> FastAPI, React, Plotly, PostgreSQL, Docker</td><td>Backend API, dashboard, database, packaging</td><td>For the decision-support screen; Docker so it runs offline on a port's own server (data sovereignty)</td></tr>
+  </table></div>
+  <div class="why"><b>The principle behind the choices:</b> every number must be reproducible by anyone who clones the repository and runs four scripts. Nothing depends on a cloud service, a paid licence, or a person's memory. That is what "on-premises, data stays in India" means in practice.</div>
+</section>
+
+<!-- ========================================================= -->
+<section id="results">
+  <div class="section-head"><span class="eyebrow">Part 5</span><h2>Our results, in plain words</h2></div>
+  <div class="table-wrap"><table>
+    <tr><th>The number</th><th>What it means</th><th>Why it matters</th></tr>
+    <tr><td><strong>106,922 ship-years, 25,967 ships</strong></td><td>How much real, audited data we trained and tested on</td><td>Answers "where does your data come from?" better than any simulated dataset could</td></tr>
+    <tr><td><strong>19.9% MAPE, R² 0.603</strong></td><td>On ships never seen in training, our energy prediction is off by about 20% on average and explains 60% of the differences between ships</td><td>It is leakage-safe, so the number is real. Per-ship year-to-year variation is ~11% — no method could ever get below that</td></tr>
+    <tr><td><strong>80.0% coverage</strong></td><td>Our "80% confidence band" really does contain the truth 80% of the time</td><td>The planner can trust the conservative end of the band</td></tr>
+    <tr><td><strong>+40% (grey ammonia)</strong></td><td>Grey ammonia is 40% worse than diesel over its lifecycle, although a funnel-only tool scores it as perfect</td><td>The single clearest reason our tool is needed</td></tr>
+    <tr><td><strong>1.72% vs 3.1%</strong></td><td>Measured methane slip from 745 real LNG ships vs the regulatory default</td><td>The two disagree on whether LNG helps at all. Ours is measured</td></tr>
+    <tr><td><strong>2035</strong></td><td>The year an electric tug beats diesel on CO₂ in India</td><td>Honest, specific, and paired with the immediate air-quality win (35.6 t NOx/tug/yr)</td></tr>
+    <tr><td><strong>30 / 30 exact</strong></td><td>On a tiny problem with a provable best answer, our optimizer found it every time</td><td>Trust on small problems is the precondition for trust on large ones</td></tr>
+    <tr><td><strong>p = 0.004</strong></td><td>At 60 ships, our optimizer beats NSGA-II and the difference is statistically real</td><td>The quantum-inspired advantage shows up where it should — on large problems</td></tr>
+    <tr><td><strong>−91% for +45%</strong></td><td>On a coastal fleet in 2047, the cleanest plan cuts emissions 91% for 45% more cost, with 14 plans between</td><td>This is the trade-off a port actually needs to see</td></tr>
+    <tr><td><strong>399 tests</strong></td><td>Automated checks, each tied to an edge case in our register</td><td>"Every number on this slide is asserted by a test"</td></tr>
+  </table></div>
+</section>
+
+<!-- ========================================================= -->
+<section id="limits">
+  <div class="section-head"><span class="eyebrow">Part 6</span><h2>Our honest limitations — say them first</h2></div>
+  <div class="prose">
+    <p>Judges respect a team that knows its own weaknesses. Say these before they are found:</p>
+    <ul>
+      <li><strong>Offshore vessels predict badly</strong> (118% error). 96% of them have no design certificate and they only entered the data in 2024. The model correctly flags them as cold-start with wide bands. They need their own model in future.</li>
+      <li><strong>Ro-pax and passenger ships</strong> are weaker (30–34%) because hotel load dominates and utilisation varies wildly.</li>
+      <li><strong>No tug is in the training data.</strong> Tug figures come from physics and published specifications and are labelled as such.</li>
+      <li><strong>Port fuel-availability years are placeholders.</strong> The structure is real; the exact years must be confirmed with each port authority. That is the natural first ask of the Mormugao pilot.</li>
+      <li><strong>The Pareto front thins above ~50 ships</strong> at our test budget. More computing budget fixes it.</li>
+      <li><strong>Nothing has run on quantum hardware.</strong> "Quantum-ready" means the problem is written in the right form and verified.</li>
+      <li><strong>The 12-ship benchmark is a tie</strong>, not a win. Say "tie".</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ========================================================= -->
+<section id="present">
+  <div class="section-head"><span class="eyebrow">Part 7</span><h2>How to present it</h2></div>
+  <div class="prose">
+    <h3>Suggested roles (one owner per topic — the test register recommends this)</h3>
+  </div>
+  <div class="role"><h4>Owner 1 — Maritime &amp; policy</h4><p>The problem, India's programmes (GTTP, Harit Sagar, Mormugao, Harit Shrey), the well-to-wake argument, the electrification story, the competitor comparison. Must be able to explain <em>grey vs green</em> and <em>methane slip</em> from memory.</p></div>
+  <div class="role"><h4>Owner 2 — Data &amp; prediction</h4><p>EU MRV, the circularity trap, physics + ML, leakage-safe testing, MAPE / R², cold-start, P10/P90. Must be able to say the accuracy numbers and what split they come from.</p></div>
+  <div class="role"><h4>Owner 3 — Quantum-inspired optimizer</h4><p>Q-bits, rotation gates, QPSO, Pareto front, constraints, benchmarking, QUBO. Must be able to say "it is not a quantum computer" clearly, explain the encoding in one diagram, and quote the p-values including the tie.</p></div>
+  <div class="prose">
+    <h3>The three-sentence pitch (memorise it)</h3>
+    <p><em>"Ports under GTTP and Harit Sagar must decide which ships, which fuels and which speeds — a decision no existing tool makes. We built a planner trained on 106,000 real audited ship-years that counts the whole lifecycle of each fuel — which flips the verdict on three fuels — and a quantum-inspired optimizer, verified against exact solutions, that returns the full cost-versus-emissions trade-off under real Indian port constraints. Our honest finding for India: electrify tugs now for air quality; the carbon win arrives with the grid around 2035."</em></p>
+    <h3>If asked something you don't know</h3>
+    <p>Say: "That is in our findings document; I will confirm the exact figure rather than guess." Then name the owner who has it. Never invent a number — an invented number that gets caught destroys everything else.</p>
+  </div>
+</section>
+
+<!-- ========================================================= -->
+<section id="glossary">
+  <div class="section-head"><span class="eyebrow">Part 8</span><h2>Glossary, A–Z</h2></div>
+  <div class="gloss">
+    <div><b>Ammonia (NH₃)</b> — a fuel with no carbon, so no CO₂ when burned; but its <em>production</em> can be very dirty (grey) or clean (green), and burning it produces N₂O.</div>
+    <div><b>AR5 / AR6</b> — the 5th and 6th IPCC assessment reports; they give slightly different GWP multipliers. The EU uses AR5; climate science uses AR6. We support both and say which.</div>
+    <div><b>Bunkering</b> — refuelling a ship.</div>
+    <div><b>CEA</b> — Central Electricity Authority of India; publishes the grid's CO₂ per unit of electricity.</div>
+    <div><b>CH₄</b> — methane, the main component of natural gas and LNG; ~28–30× CO₂'s warming effect.</div>
+    <div><b>CO₂e</b> — CO₂-equivalent; all greenhouse gases converted to one unit using GWP.</div>
+    <div><b>Cold-start</b> — a ship the model has almost no information about; it gets a physics estimate and a wide uncertainty band.</div>
+    <div><b>Constraint</b> — a rule a plan must obey (deliver all cargo, stay under the emission cap, only use available fuel…).</div>
+    <div><b>CP-SAT / MILP</b> — exact mathematical solvers that <em>prove</em> the best answer; we use them to verify our method on small problems.</div>
+    <div><b>Cube law</b> — a ship's propulsion power rises with speed³; slow down 14→12 knots and power drops ~37%.</div>
+    <div><b>Discrete vs continuous</b> — "pick one from a list" (which fuel) vs "any value in a range" (speed).</div>
+    <div><b>EMSA</b> — European Maritime Safety Agency; publishes the MRV data.</div>
+    <div><b>GT (gross tonnage)</b> — a measure of ship size. MRV covers ships ≥5,000 GT; tugs are ~200–500 GT.</div>
+    <div><b>GTTP</b> — Green Tug Transition Programme; India's scheme to replace diesel tugs with electric / clean-fuel ones.</div>
+    <div><b>GWP</b> — Global Warming Potential; the multiplier that turns a gas into CO₂e over a stated horizon (we use 100 years).</div>
+    <div><b>Grey / blue / green</b> — how a fuel was made: from fossil gas with no capture (grey), with carbon capture (blue), or from renewable electricity (green).</div>
+    <div><b>Harit Sagar</b> — India's green-port guidelines: −30% emissions per tonne of cargo by 2030, −70% by 2047.</div>
+    <div><b>Harit Shrey</b> — Mormugao Port's incentive scheme that discounts port charges for cleaner ships.</div>
+    <div><b>Hotel load</b> — a ship's power use that does not depend on speed (lights, cooling, pumps); large on cruise ships.</div>
+    <div><b>Hypervolume</b> — how much of the trade-off space a Pareto front covers; the standard score for comparing multi-objective optimizers.</div>
+    <div><b>Knot</b> — 1 nautical mile per hour ≈ 1.85 km/h.</div>
+    <div><b>Leakage</b> — when test data secretly overlaps training data, making accuracy look better than it is. We split by whole ships to prevent it.</div>
+    <div><b>LHV</b> — lower heating value; energy per kilogram of a fuel. Methanol's is about half of diesel's.</div>
+    <div><b>LNG</b> — liquefied natural gas; cleaner on CO₂ but leaks methane.</div>
+    <div><b>MAPE</b> — mean absolute percentage error; average % by which predictions miss. Lower is better.</div>
+    <div><b>Methane slip</b> — unburnt methane escaping from an LNG engine. Default 3.1%; measured 1.72%.</div>
+    <div><b>Monotone constraint</b> — telling the machine-learning model an input may only push the answer one way (e.g. a less-efficient design never predicts less energy).</div>
+    <div><b>MRV</b> — Monitoring, Reporting and Verification; the EU ship-emissions law and its data.</div>
+    <div><b>N₂O</b> — nitrous oxide; ~265–273× CO₂'s warming effect; formed when ammonia burns.</div>
+    <div><b>Nautical mile (nmi)</b> — 1,852 m.</div>
+    <div><b>NOx / SOx / PM</b> — local air pollutants (nitrogen oxides, sulphur oxides, particulate matter). Harm health; kept separate from CO₂e.</div>
+    <div><b>NSGA-II</b> — the standard genetic algorithm for multi-objective problems; our main baseline.</div>
+    <div><b>P10 / P50 / P90</b> — low / middle / high estimates; the P10–P90 band should contain the truth 80% of the time.</div>
+    <div><b>p-value</b> — probability a result is due to luck; below 0.05 counts as significant.</div>
+    <div><b>Pareto front</b> — the set of plans where nothing can improve without something else worsening; the output of the optimizer.</div>
+    <div><b>Pilot fuel</b> — the small dose of diesel a methanol or ammonia engine needs to ignite; we count it.</div>
+    <div><b>Q-bit</b> — a decision stored as a probability (amplitudes), not a fixed yes/no; the core of the quantum-inspired encoding.</div>
+    <div><b>QIEA</b> — Quantum-Inspired Evolutionary Algorithm; Q-bits plus rotation gates. Used for the discrete decisions.</div>
+    <div><b>QPSO</b> — Quantum-behaved Particle Swarm Optimization; a velocity-free swarm search. Used for continuous speeds.</div>
+    <div><b>QUBO</b> — Quadratic Unconstrained Binary Optimization; the form quantum annealers consume. Our "quantum-ready" claim.</div>
+    <div><b>R²</b> — share of variation the model explains, 0 to 1.</div>
+    <div><b>Rotation gate</b> — the update that nudges a Q-bit's probability toward the best solution; the "quantum update mechanism".</div>
+    <div><b>Seed</b> — the starting number for a random process; the same seed gives the same result (reproducibility). We use 30 different seeds for benchmarks.</div>
+    <div><b>Shaft energy</b> — useful work delivered at the propeller shaft; the fair basis for comparing fuels with batteries.</div>
+    <div><b>SHA-256</b> — a digital fingerprint of a file; proves which exact data version produced a result.</div>
+    <div><b>Shore power / OPS / cold ironing</b> — plugging a docked ship into the grid.</div>
+    <div><b>Slow steaming</b> — deliberately sailing slower to save fuel (cube law).</div>
+    <div><b>T&amp;D losses</b> — electricity lost in wires between power station and ship (~17% in India).</div>
+    <div><b>THETIS-MRV</b> — EMSA's online system that publishes the MRV data.</div>
+    <div><b>Well-to-wake</b> — the full lifecycle of a fuel: making it (well-to-tank) plus burning it (tank-to-wake).</div>
+    <div><b>Wilcoxon signed-rank test</b> — a statistical test for whether two paired sets of results genuinely differ.</div>
+    <div><b>XGBoost</b> — the machine-learning method we use for the ship-specific efficiency level.</div>
+  </div>
+  <p class="foot">Companion documents: <code>docs/REPORT_FOR_PPT.pdf</code> (the results, slide by slide) · <code>docs/FINDINGS_PHASE1.md</code>, <code>FINDINGS_PHASE2.md</code>, <code>FINDINGS_PHASE3.md</code> (the full technical record) · <code>docs/TEST_AND_EDGE_CASES.md</code> (the test register every ID refers to).</p>
+</section>
+
+</main>
+</div>

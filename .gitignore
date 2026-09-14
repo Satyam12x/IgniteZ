@@ -1,0 +1,43 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.ipynb_checkpoints/
+.env
+
+# ---- Node (only used to rebuild the dashboard CSS) ----
+node_modules/
+package-lock.json
+
+# ---- Data ----
+# Raw EMSA workbooks (~44 MB) are re-downloadable: python -m greenfleet.data.mrv.download
+data/raw/**
+!data/raw/.gitkeep
+data/processed/**
+!data/processed/.gitkeep
+# data/interim/*.parquet IS committed (22 MB): the panel the model trains on,
+# so a fresh clone can train, evaluate and run the platform without downloading.
+
+# ---- Artifacts ----
+# Committed: artifacts/model/ (served model + model card), artifacts/*.json (results),
+# artifacts/charts/ (report figures). Ignored: logs and PDF-render intermediates.
+artifacts/*.log
+artifacts/*.err
+artifacts/*_print.html
+
+# ---- Docs ----
+# Third-party sample decks used for reference only
+docs/Sample PPTs/
+
+# ---- OS / editors ----
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp

@@ -1,0 +1,382 @@
+# Fuel properties and well-to-wake emission factors.
+#
+# F-09: nothing here may be hard-coded in Python. Change a number here and every
+# downstream result changes. PPT-02: every number carries `source` + `confidence`.
+#
+# confidence:
+#   high        - taken verbatim from a binding regulatory instrument
+#   medium      - published default from a regulation still being finalised
+#   provisional - engineering estimate; MUST be replaced before any published claim
+#
+# Units (see greenfleet.units):
+#   lhv_mj_per_kg        MJ/kg      lower heating value
+#   density_kg_per_m3    kg/m3      liquid density at storage condition
+#   cf_co2_t_per_t       tCO2/t     tank-to-wake CO2 only, per tonne of fuel burned
+#   wtt_gco2e_per_mj     gCO2e/MJ   well-to-tank, by production pathway
+#   tank_system_factor   -          total tank volume / neat fuel volume (insulation,
+#                                   containment, boil-off handling). Drives F-04/F-05.
+#   conversion_efficiency -         shaft energy delivered per unit of fuel energy
+#   nox/sox/pm_g_per_kg  g/kg       local air pollutants, per kg of fuel burned
+#
+# LOCAL POLLUTANTS ARE NOT GREENHOUSE GASES and are never added into CO2e. They
+# are tracked separately because they are what a port city actually breathes, and
+# because they are the honest counterweight to the shore-power CO2 result: on a
+# coal-heavy grid, electrification can raise CO2 in the near term while removing
+# NOx, SOx and particulates from the quayside on day one (F-07).
+#
+# CONVERSION EFFICIENCY MATTERS MORE THAN IT LOOKS. A marine diesel turns roughly
+# 45% of fuel energy into shaft work; an electric drivetrain turns roughly 92% of
+# electrical energy into shaft work. Comparing a fuel and a battery on *input*
+# energy therefore penalises the battery by a factor of two and produces exactly
+# the wrong recommendation for an electrification programme. Everything downstream
+# is specified in SHAFT energy and converted here.
+
+meta:
+  schema_version: 1
+  gwp_set: ar6_gwp100          # F-10: the horizon must be stated, not implied
+  notes: >
+    Tank-to-wake Cf and LHV are IMO MEPC.308(73) values and are stable.
+    Well-to-tank factors and methane slip are FuelEU Maritime / IMO LCA defaults
+    and are the numbers to re-verify against the current instrument before any
+    external claim.
+
+# Global warming potentials. Switch `meta.gwp_set` to change the whole model.
+gwp:
+  ar6_gwp100:
+    horizon_years: 100
+    source: "IPCC AR6 WG1 Ch.7 Table 7.15"
+    confidence: high
+    co2: 1.0
+    ch4_fossil: 29.8
+    ch4_biogenic: 27.0
+    n2o: 273.0
+  ar5_gwp100:
+    horizon_years: 100
+    source: "IPCC AR5 WG1 Ch.8 Table 8.7 (used by some regulatory instruments)"
+    confidence: high
+    co2: 1.0
+    ch4_fossil: 30.0
+    ch4_biogenic: 28.0
+    n2o: 265.0
+
+  # The set the EU actually uses, recovered by solving
+  #   CO2eq - CO2 = a*CH4 + b*N2O
+  # across 28,125 published 2024-2025 filings. The fit is exact to a maximum
+  # relative residual of 1.6e-14, so these are the coefficients EMSA applies, not
+  # an estimate of them. Use this set when a number must reconcile with an
+  # official EU MRV figure; use ar6_gwp100 for current climate science.
+  eu_mrv_ar5:
+    horizon_years: 100
+    source: >
+      Recovered exactly from 28,125 EU MRV 2024-2025 filings
+      (CO2eq - CO2 = 28.00*CH4 + 265.00*N2O, max relative residual 1.6e-14).
+      Corresponds to IPCC AR5 GWP100 with the non-fossil CH4 value.
+    confidence: high
+    co2: 1.0
+    ch4_fossil: 28.0
+    ch4_biogenic: 28.0
+    n2o: 265.0
+
+fuels:
+
+  hfo:
+    display_name: "Heavy fuel oil"
+    lhv_mj_per_kg: 40.2
+    density_kg_per_m3: 991.0
+    cf_co2_t_per_t: 3.114
+    source_ttw: "IMO MEPC.308(73), 2018 EEDI Guidelines, Table 1"
+    confidence_ttw: high
+    tank_system_factor: 1.0
+    conversion_efficiency: 0.45   # shaft energy per unit fuel energy
+    source_efficiency: "Large two-stroke marine diesel, typical service load"
+    confidence_efficiency: medium
+    nox_g_per_kg: 57.0
+    sox_g_per_kg: 10.0
+    pm_g_per_kg: 1.4
+    source_local: "Tier II slow-speed diesel; SOx at the 0.50% global sulphur cap"
+    confidence_local: provisional
+    # MEASURED, not assumed: 0.180 g N2O and 0.050 g CH4 per kg of fuel is the
+    # median across 17,288 HFO-burning ship-years in EU MRV 2024-2025. The CH4
+    # figure reproduces the IMO Fourth GHG Study default exactly; the N2O figure
+    # is 20% above it. Converted here by the fuel's own LHV (40.2 MJ/kg).
+    n2o_g_per_mj: 0.004478      # 0.180 g/kg
+    ch4_g_per_mj: 0.001244      # 0.050 g/kg
+    source_non_co2: >
+      Median of 17,288 measured ship-years, EU MRV 2024-2025 reporting periods.
+    confidence_non_co2: high
+    pathways:
+      fossil:
+        label: "Conventional refinery"
+        wtt_gco2e_per_mj: 13.5
+        source: "FuelEU Maritime Annex II default (VERIFY against current text)"
+        confidence: medium
+
+  mgo:
+    display_name: "Marine gas oil / diesel"
+    lhv_mj_per_kg: 42.7
+    density_kg_per_m3: 890.0
+    cf_co2_t_per_t: 3.206
+    source_ttw: "IMO MEPC.308(73), 2018 EEDI Guidelines, Table 1"
+    confidence_ttw: high
+    tank_system_factor: 1.0
+    conversion_efficiency: 0.45   # shaft energy per unit fuel energy
+    source_efficiency: "Large two-stroke marine diesel, typical service load"
+    confidence_efficiency: medium
+    nox_g_per_kg: 57.0
+    sox_g_per_kg: 2.0
+    pm_g_per_kg: 0.3
+    source_local: "Tier II slow-speed diesel; SOx at the 0.10% ECA sulphur limit"
+    confidence_local: provisional
+    # MEASURED: median of 9,333 distillate-burning ship-years, EU MRV 2024-2025.
+    # Same per-kg values as HFO (0.180 g N2O, 0.050 g CH4), converted by the MGO
+    # LHV of 42.7 MJ/kg.
+    n2o_g_per_mj: 0.004215      # 0.180 g/kg
+    ch4_g_per_mj: 0.001171      # 0.050 g/kg
+    source_non_co2: >
+      Median of 9,333 measured ship-years, EU MRV 2024-2025 reporting periods.
+    confidence_non_co2: high
+    pathways:
+      fossil:
+        label: "Conventional refinery"
+        wtt_gco2e_per_mj: 14.4
+        source: "FuelEU Maritime Annex II default (VERIFY)"
+        confidence: medium
+      bio:
+        label: "HVO / biodiesel drop-in"
+        wtt_gco2e_per_mj: 16.0
+        biogenic_carbon: true      # TtW CO2 treated as biogenic; see emissions engine
+        source: "Provisional; pathway-specific and feedstock-dependent"
+        confidence: provisional
+
+  lng:
+    display_name: "Liquefied natural gas"
+    lhv_mj_per_kg: 48.0
+    density_kg_per_m3: 450.0
+    cf_co2_t_per_t: 2.750
+    source_ttw: "IMO MEPC.308(73), 2018 EEDI Guidelines, Table 1"
+    confidence_ttw: high
+    tank_system_factor: 1.75      # cryogenic membrane/Type C containment
+    conversion_efficiency: 0.45   # shaft energy per unit fuel energy
+    source_efficiency: "Otto-cycle dual-fuel, comparable to diesel at service load"
+    confidence_efficiency: medium
+    nox_g_per_kg: 10.0
+    sox_g_per_kg: 0.0
+    pm_g_per_kg: 0.02
+    source_local: "Gas combustion: very low NOx, no fuel sulphur"
+    confidence_local: provisional
+    source_tank: "Provisional engineering estimate"
+    confidence_tank: provisional
+    # MEASURED: median of 985 LNG-dominant ship-years, EU MRV 2024-2025.
+    n2o_g_per_mj: 0.002388      # 0.1146 g/kg
+    source_non_co2: >
+      Median of 985 measured LNG-dominant ship-years, EU MRV 2024-2025.
+    confidence_non_co2: high
+    # F-02: methane slip is engine-technology specific, NOT a single fuel constant.
+    # Expressed as % of fuel mass passing through unburnt.
+    #
+    # The regulatory defaults and the measured fleet disagree, and the gap matters.
+    # FuelEU's headline default for Otto medium-speed is 3.1%; the measured median
+    # across 745 LNG carriers in EU MRV 2024-2025 is 1.72%, roughly half. The fleet
+    # is a mix of engine technologies - many LNG carriers run diesel-cycle two-stroke
+    # or steam turbines, which slip far less than Otto-cycle engines - so 3.1% is
+    # the right number for one engine type and the wrong number for a fleet average.
+    #
+    # Rule used here: if the engine technology is known, use its regulatory value;
+    # if it is not, use `fleet_measured` rather than assuming the worst engine.
+    # Assuming Otto medium-speed for an unknown engine overstates LNG's methane
+    # penalty by ~1.8x and would bias the optimizer against LNG on false evidence.
+    methane_slip_pct_of_fuel_mass:
+      otto_medium_speed: 3.1
+      otto_slow_speed: 1.7
+      diesel_slow_speed: 0.2
+      diesel_medium_speed: 0.2
+      lbsi: 2.6
+      steam_turbine: 0.2
+      fleet_measured: 1.716
+    default_engine: fleet_measured
+    # The measured spread is wide - a factor of 4.7 from p25 to p95 - so a single
+    # point value understates the uncertainty on any individual vessel. Carried
+    # here so the emissions engine can report a range, not just a number.
+    measured_slip_percentiles:
+      p25: 0.632
+      p50: 1.716
+      p75: 2.118
+      p95: 2.965
+      n_ship_years: 745
+    source_slip: >
+      Engine-specific values are FuelEU Maritime Annex I/II Cslip defaults.
+      `fleet_measured` and the percentiles are the observed CH4-to-fuel ratio
+      across 745 LNG carrier ship-years in EU MRV 2024-2025.
+    confidence_slip: high
+    pathways:
+      fossil:
+        label: "Pipeline / liquefied fossil gas"
+        wtt_gco2e_per_mj: 18.5
+        source: "FuelEU Maritime Annex II default (VERIFY)"
+        confidence: medium
+      bio_lbg:
+        label: "Liquefied biogas"
+        wtt_gco2e_per_mj: 10.0
+        biogenic_carbon: true
+        source: "Provisional; feedstock-dependent"
+        confidence: provisional
+
+  methanol:
+    display_name: "Methanol"
+    lhv_mj_per_kg: 19.9
+    density_kg_per_m3: 792.0
+    cf_co2_t_per_t: 1.375
+    source_ttw: "IMO MEPC.308(73), 2018 EEDI Guidelines, Table 1"
+    confidence_ttw: high
+    tank_system_factor: 1.15      # cofferdams for a toxic, low-flash-point fuel
+    conversion_efficiency: 0.45   # shaft energy per unit fuel energy
+    source_efficiency: "Dual-fuel compression ignition, comparable to diesel"
+    confidence_efficiency: medium
+    nox_g_per_kg: 25.0
+    sox_g_per_kg: 0.0
+    pm_g_per_kg: 0.05
+    source_local: "Low flame temperature, no fuel sulphur"
+    confidence_local: provisional
+    source_tank: "Provisional engineering estimate"
+    confidence_tank: provisional
+    n2o_g_per_mj: 0.0006
+    ch4_g_per_mj: 0.0002
+    confidence_non_co2: provisional
+    # P-09: dual-fuel engines burn pilot MGO. It adds cost AND emissions.
+    pilot_fuel:
+      fuel: mgo
+      pathway: fossil          # pilot ignition fuel is conventional distillate
+      energy_fraction: 0.04
+      source: "MAN ES ME-LGI / Wartsila DF published pilot ranges (3-5%)"
+      confidence: medium
+    pathways:
+      fossil:
+        label: "Grey methanol from natural gas"
+        wtt_gco2e_per_mj: 31.3
+        source: "FuelEU Maritime Annex II default (VERIFY)"
+        confidence: medium
+      bio:
+        label: "Bio-methanol"
+        wtt_gco2e_per_mj: 12.0
+        biogenic_carbon: true
+        source: "Provisional; feedstock-dependent"
+        confidence: provisional
+      e_fuel:
+        label: "E-methanol (renewable H2 + captured CO2)"
+        wtt_gco2e_per_mj: 5.0
+        biogenic_carbon: true
+        source: "Provisional; depends on electricity and CO2 source"
+        confidence: provisional
+
+  ammonia:
+    display_name: "Ammonia"
+    lhv_mj_per_kg: 18.6
+    density_kg_per_m3: 682.0
+    cf_co2_t_per_t: 0.0          # carbon-free molecule: zero TtW CO2 by definition
+    source_ttw: "Stoichiometric (NH3 contains no carbon)"
+    confidence_ttw: high
+    tank_system_factor: 1.30      # pressurised/refrigerated + toxicity containment
+    conversion_efficiency: 0.45   # shaft energy per unit fuel energy
+    source_efficiency: "Dual-fuel compression ignition, comparable to diesel"
+    confidence_efficiency: medium
+    nox_g_per_kg: 12.0
+    sox_g_per_kg: 0.0
+    pm_g_per_kg: 0.02
+    source_local: "Assumes SCR aftertreatment; untreated NOx would be far higher"
+    confidence_local: provisional
+    source_tank: "Provisional engineering estimate"
+    confidence_tank: provisional
+    # F-03: N2O from ammonia combustion. GWP100 = 273, so this cannot be dropped.
+    # This is the single most uncertain number in the file and is flagged loudly.
+    n2o_g_per_mj: 0.030
+    source_non_co2: "Literature range is wide; placeholder pending engine test data"
+    confidence_non_co2: provisional
+    pilot_fuel:
+      fuel: mgo
+      pathway: fossil          # pilot ignition fuel is conventional distillate
+      energy_fraction: 0.07
+      source: "MAN ES ME-LGIA published pilot range (5-10%)"
+      confidence: medium
+    pathways:
+      # F-01: this is the headline honesty case. Grey ammonia can be WORSE than
+      # diesel on a lifecycle basis. The model must be able to show that.
+      grey:
+        label: "Grey ammonia (SMR of natural gas, unabated)"
+        wtt_gco2e_per_mj: 121.0
+        source: "Provisional; literature range ~100-160 gCO2e/MJ"
+        confidence: provisional
+      blue:
+        label: "Blue ammonia (SMR + carbon capture)"
+        wtt_gco2e_per_mj: 33.0
+        source: "Provisional; depends on capture rate and upstream methane leakage"
+        confidence: provisional
+      green:
+        label: "Green ammonia (renewable electrolysis)"
+        wtt_gco2e_per_mj: 5.0
+        source: "Provisional; depends on renewable electricity footprint"
+        confidence: provisional
+
+  hydrogen:
+    display_name: "Hydrogen (liquid)"
+    lhv_mj_per_kg: 120.0
+    density_kg_per_m3: 71.0       # liquid at 20 K
+    cf_co2_t_per_t: 0.0
+    source_ttw: "Stoichiometric (H2 contains no carbon)"
+    confidence_ttw: high
+    # F-04: this factor plus the low volumetric density is what confines hydrogen
+    # to short routes - harbour tugs, ferries, short coastal legs.
+    tank_system_factor: 3.00
+    conversion_efficiency: 0.5   # shaft energy per unit fuel energy
+    source_efficiency: "PEM fuel cell with electric drive; an H2 ICE would be ~0.40"
+    confidence_efficiency: medium
+    nox_g_per_kg: 0.0
+    sox_g_per_kg: 0.0
+    pm_g_per_kg: 0.0
+    source_local: "Fuel cell: water only at the point of use"
+    confidence_local: provisional
+    source_tank: "Provisional; cryogenic insulation dominates system volume"
+    confidence_tank: provisional
+    n2o_g_per_mj: 0.0
+    ch4_g_per_mj: 0.0
+    pathways:
+      grey:
+        label: "Grey hydrogen (SMR, unabated)"
+        wtt_gco2e_per_mj: 110.0
+        source: "Provisional; literature range ~90-140 gCO2e/MJ"
+        confidence: provisional
+      blue:
+        label: "Blue hydrogen (SMR + CCS)"
+        wtt_gco2e_per_mj: 30.0
+        source: "Provisional"
+        confidence: provisional
+      green:
+        label: "Green hydrogen (renewable electrolysis)"
+        wtt_gco2e_per_mj: 8.0
+        source: "Provisional"
+        confidence: provisional
+
+  electricity:
+    display_name: "Shore power / battery electric"
+    # Electricity is handled as an energy carrier: emissions come from the grid
+    # factor in ports.yaml (F-07), not from a fuel LHV.
+    is_energy_carrier: true
+    lhv_mj_per_kg: null
+    density_kg_per_m3: null
+    cf_co2_t_per_t: 0.0
+    source_ttw: "Zero at point of use; all emissions are upstream (grid)"
+    confidence_ttw: high
+    # Zero at the quayside by definition: generation happens at a power station
+    # away from the port city. That displacement is the immediate public-health
+    # case for shore power, independent of the CO2 arithmetic.
+    nox_g_per_kg: 0.0
+    sox_g_per_kg: 0.0
+    pm_g_per_kg: 0.0
+    source_local: "Zero at point of use; generation emissions occur off-site"
+    confidence_local: high
+    charge_discharge_efficiency: 0.90
+    conversion_efficiency: 0.92   # motor + drivetrain, electrical energy to shaft
+    source_efficiency: >
+      Round-trip battery efficiency 0.90 and motor/drivetrain efficiency 0.92.
+      The drivetrain figure is roughly twice a thermal engine's, which is why
+      electrification must be compared on shaft energy, not input energy.
+    confidence_efficiency: provisional

@@ -1,0 +1,57 @@
+{
+  "name": "XGBoost + mono + QPSO",
+  "trained_at": "2026-09-14T06:55:46+00:00",
+  "panel": {
+    "path": "data\\interim\\mrv_derived.parquet",
+    "sha256": "91fbc48d1a3a8610566b38c740a8bdc6ee562853dc98950fc6636aefbb050f7c",
+    "n_ship_years": 100528,
+    "n_ships": 25051,
+    "reporting_periods": [
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ]
+  },
+  "features": [
+    "vessel_class",
+    "design_efficiency_gco2_per_t_nmi",
+    "has_design_efficiency",
+    "efficiency_metric_eiv",
+    "efficiency_metric_eedi",
+    "efficiency_metric_eexi",
+    "has_ice_class",
+    "ice_class_ordinal",
+    "ice_time_share",
+    "reporting_period",
+    "time_at_sea_h"
+  ],
+  "params": {
+    "residual_model": "xgboost",
+    "monotone": 1.0,
+    "n_estimators": 621.0,
+    "max_depth": 10.0,
+    "learning_rate": 0.01614990495973882,
+    "subsample": 0.5789093748702012,
+    "colsample_bytree": 0.7919382090351483,
+    "min_child_weight": 1.3119749237315028,
+    "reg_lambda": 8.652872589718267
+  },
+  "seed": 1000,
+  "intervals": "P10/P90 calibrated on 5-fold grouped out-of-fold residuals",
+  "held_out": {
+    "split": "by_vessel: 25% of ships held out, no ship on both sides",
+    "n_test_ship_years": 25105,
+    "n_test_ships": 6263,
+    "mape_pct": 20.262229041929075,
+    "r2": 0.592660314042819,
+    "median_ape_pct": 13.74237120166062,
+    "interval_coverage_80": 0.8009958175662218
+  },
+  "fit_seconds": 7.6,
+  "python": "3.10.11"
+}

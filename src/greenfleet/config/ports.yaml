@@ -1,0 +1,259 @@
+# Indian port infrastructure: fuel availability, shore power, and grid carbon.
+#
+# This file is the India-specific moat. Voyage-level tools optimise a route; they do
+# not know that green hydrogen is only bunkerable at three Indian ports, that shore
+# power is only as clean as the CEA grid factor, or that Mormugao discounts port
+# charges by environmental performance. Those constraints are what turn a generic
+# optimizer into one a port authority can actually act on.
+#
+# F-06: the optimizer must never assign a fuel a vessel cannot bunker on its route.
+# F-07: shore-power emissions follow the grid, not zero.
+# F-08: shore power requires BOTH a fitted port and a fitted vessel.
+# S-04: fuel availability is indexed by year, so multi-year transition scenarios work.
+# S-05: the grid factor declines over time, so the shore-power benefit grows.
+#
+# Availability values:
+#   none        not bunkerable
+#   planned     announced or under construction, not yet operational
+#   limited     available in small volumes or by prior arrangement
+#   available   routinely bunkerable
+#
+# Shore-power status is year-indexed on the same scale, because onshore power
+# supply is being commissioned progressively across the major ports. "planned" is
+# deliberately NOT usable: a fleet plan that assumes an uncommissioned OPS berth
+# is a plan that strands vessels at anchor burning auxiliary fuel.
+#
+# CONFIDENCE NOTE. Port-level alternative-fuel bunkering in India is changing fast
+# and much of it is announcement-stage. Every availability entry is tagged, and
+# anything not `confidence: high` must be verified against the port authority before
+# it appears in a published result or a pitch. The structure is the deliverable here;
+# the specific availability years are placeholders to be confirmed with port data.
+
+meta:
+  schema_version: 1
+  country: IN
+  currency: INR
+  confidence_availability: provisional
+  source_availability: >
+    Structure and port list from Ministry of Ports, Shipping and Waterways major-port
+    listings, the Green Tug Transition Programme, and the National Green Hydrogen
+    Mission hub designations. Specific per-year bunkering availability is
+    PLACEHOLDER and must be confirmed with each port authority before publication.
+
+# ---------------------------------------------------------------------------
+# Grid carbon intensity (F-07). Shore power is only as clean as the electricity.
+#
+# India's grid is coal-heavy, so shore power is NOT zero-emission here. It removes
+# local pollution at the berth immediately - which is the real near-term win for a
+# port city - while its CO2 benefit depends on the grid mix and improves each year.
+# Saying this plainly is more credible than claiming shore power is clean.
+# ---------------------------------------------------------------------------
+grid:
+  source: >
+    CEA CO2 Baseline Database for the Indian Power Sector. The historical value is
+    the published weighted-average operating margin; forward years are a linear
+    glide consistent with the 500 GW non-fossil capacity target for 2030 and are
+    clearly marked as projections, not published figures.
+  confidence_historical: medium
+  confidence_projected: provisional
+  # tCO2 per MWh delivered
+  emission_factor_t_per_mwh:
+    2023: 0.716
+    2024: 0.710
+    2025: 0.702
+    2026: 0.690
+    2027: 0.672
+    2028: 0.650
+    2029: 0.625
+    2030: 0.600
+    2035: 0.480
+    2040: 0.360
+    2047: 0.200
+  # Transmission and distribution losses, applied on top of generation intensity.
+  t_and_d_loss_fraction: 0.17
+  source_losses: "CEA national T&D loss figures; indicative"
+  confidence_losses: provisional
+
+# ---------------------------------------------------------------------------
+# Policy targets (S-06). Harit Sagar sets emission intensity reduction targets per
+# tonne of cargo handled, against a stated baseline year.
+# ---------------------------------------------------------------------------
+policy:
+  harit_sagar:
+    source: >
+      Harit Sagar Green Port Guidelines, Ministry of Ports, Shipping and Waterways:
+      reduce carbon emissions per tonne of cargo handled by 30% by 2030 and 70% by
+      2047.
+    confidence: high
+    baseline_year: 2023
+    targets:
+      2030: 0.30
+      2047: 0.70
+  harit_shrey:
+    source: >
+      Mormugao Port Authority green ship incentive scheme, which discounts port
+      charges according to a vessel's environmental performance.
+    confidence: medium
+    port: mormugao
+    enabled: true
+
+# ---------------------------------------------------------------------------
+# Ports
+# ---------------------------------------------------------------------------
+ports:
+
+  mormugao:
+    display_name: "Mormugao Port"
+    state: "Goa"
+    unlocode: INMRM
+    # The demonstration site: the problem statement's sponsor signed a strategic
+    # quantum technology agreement with this port authority, and it runs India's
+    # first green ship incentive scheme.
+    is_demo_site: true
+    green_hydrogen_hub: false
+    gttp_port: false
+    shore_power:
+      status: {2024: planned, 2028: available}
+      max_mw: 4.0
+      confidence: provisional
+    fuel_availability:
+      hfo: {2024: available, 2030: available, 2047: limited}
+      mgo: {2024: available, 2030: available, 2047: available}
+      lng: {2024: none, 2030: planned, 2047: limited}
+      methanol: {2024: none, 2030: planned, 2047: limited}
+      ammonia: {2024: none, 2030: none, 2047: planned}
+      hydrogen: {2024: none, 2030: none, 2047: planned}
+      electricity: {2024: planned, 2030: available, 2047: available}
+
+  deendayal:
+    display_name: "Deendayal Port (Kandla)"
+    state: "Gujarat"
+    unlocode: INIXY
+    green_hydrogen_hub: true      # designated under the National Green Hydrogen Mission
+    gttp_port: true               # electric tug work orders placed
+    shore_power:
+      status: {2024: planned, 2027: available}
+      max_mw: 6.0
+      confidence: provisional
+    fuel_availability:
+      hfo: {2024: available, 2030: available, 2047: limited}
+      mgo: {2024: available, 2030: available, 2047: available}
+      lng: {2024: limited, 2030: available, 2047: available}
+      methanol: {2024: none, 2030: limited, 2047: available}
+      ammonia: {2024: none, 2030: planned, 2047: limited}
+      hydrogen: {2024: none, 2030: planned, 2047: limited}
+      electricity: {2024: planned, 2030: available, 2047: available}
+
+  paradip:
+    display_name: "Paradip Port"
+    state: "Odisha"
+    unlocode: INPRT
+    green_hydrogen_hub: true
+    gttp_port: false
+    shore_power:
+      status: {2024: planned, 2029: available}
+      max_mw: 4.0
+      confidence: provisional
+    fuel_availability:
+      hfo: {2024: available, 2030: available, 2047: limited}
+      mgo: {2024: available, 2030: available, 2047: available}
+      lng: {2024: none, 2030: limited, 2047: available}
+      methanol: {2024: none, 2030: planned, 2047: limited}
+      ammonia: {2024: none, 2030: planned, 2047: limited}
+      hydrogen: {2024: none, 2030: planned, 2047: limited}
+      electricity: {2024: planned, 2030: available, 2047: available}
+
+  vo_chidambaranar:
+    display_name: "V.O. Chidambaranar Port (Thoothukudi)"
+    state: "Tamil Nadu"
+    unlocode: INTUT
+    green_hydrogen_hub: true
+    gttp_port: true
+    shore_power:
+      status: {2024: planned, 2028: available}
+      max_mw: 5.0
+      confidence: provisional
+    fuel_availability:
+      hfo: {2024: available, 2030: available, 2047: limited}
+      mgo: {2024: available, 2030: available, 2047: available}
+      lng: {2024: none, 2030: limited, 2047: available}
+      methanol: {2024: none, 2030: limited, 2047: available}
+      ammonia: {2024: none, 2030: planned, 2047: limited}
+      hydrogen: {2024: none, 2030: planned, 2047: limited}
+      electricity: {2024: planned, 2030: available, 2047: available}
+
+  jnpa:
+    display_name: "Jawaharlal Nehru Port Authority (Nhava Sheva)"
+    state: "Maharashtra"
+    unlocode: INNSA
+    green_hydrogen_hub: false
+    gttp_port: true
+    shore_power:
+      status: {2024: limited, 2027: available}
+      max_mw: 8.0
+      confidence: provisional
+    fuel_availability:
+      hfo: {2024: available, 2030: available, 2047: limited}
+      mgo: {2024: available, 2030: available, 2047: available}
+      lng: {2024: limited, 2030: available, 2047: available}
+      methanol: {2024: none, 2030: limited, 2047: available}
+      ammonia: {2024: none, 2030: planned, 2047: limited}
+      hydrogen: {2024: none, 2030: none, 2047: planned}
+      electricity: {2024: planned, 2030: available, 2047: available}
+
+  visakhapatnam:
+    display_name: "Visakhapatnam Port"
+    state: "Andhra Pradesh"
+    unlocode: INVTZ
+    green_hydrogen_hub: false
+    gttp_port: true
+    shore_power:
+      status: {2024: planned, 2028: available}
+      max_mw: 5.0
+      confidence: provisional
+    fuel_availability:
+      hfo: {2024: available, 2030: available, 2047: limited}
+      mgo: {2024: available, 2030: available, 2047: available}
+      lng: {2024: none, 2030: limited, 2047: available}
+      methanol: {2024: none, 2030: limited, 2047: available}
+      ammonia: {2024: none, 2030: planned, 2047: limited}
+      hydrogen: {2024: none, 2030: none, 2047: planned}
+      electricity: {2024: planned, 2030: available, 2047: available}
+
+  cochin:
+    display_name: "Cochin Port"
+    state: "Kerala"
+    unlocode: INCOK
+    green_hydrogen_hub: false
+    gttp_port: false
+    shore_power:
+      status: {2024: planned, 2030: available}
+      max_mw: 3.0
+      confidence: provisional
+    fuel_availability:
+      hfo: {2024: available, 2030: available, 2047: limited}
+      mgo: {2024: available, 2030: available, 2047: available}
+      lng: {2024: limited, 2030: available, 2047: available}
+      methanol: {2024: none, 2030: planned, 2047: limited}
+      ammonia: {2024: none, 2030: none, 2047: planned}
+      hydrogen: {2024: none, 2030: none, 2047: planned}
+      electricity: {2024: planned, 2030: available, 2047: available}
+
+  mumbai:
+    display_name: "Mumbai Port"
+    state: "Maharashtra"
+    unlocode: INBOM
+    green_hydrogen_hub: false
+    gttp_port: false
+    shore_power:
+      status: {2024: planned, 2029: available}
+      max_mw: 4.0
+      confidence: provisional
+    fuel_availability:
+      hfo: {2024: available, 2030: available, 2047: limited}
+      mgo: {2024: available, 2030: available, 2047: available}
+      lng: {2024: none, 2030: limited, 2047: available}
+      methanol: {2024: none, 2030: planned, 2047: limited}
+      ammonia: {2024: none, 2030: none, 2047: planned}
+      hydrogen: {2024: none, 2030: none, 2047: planned}
+      electricity: {2024: planned, 2030: available, 2047: available}

@@ -1,0 +1,451 @@
+<title>Green Fleet Optimizer Results</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    color-scheme: light;
+    --ground: #f5f7f6;
+    --surface: #ffffff;
+    --surface-2: #eef2f0;
+    --ink: #14202b;
+    --ink-2: #4a5866;
+    --muted: #7c8791;
+    --line: #dde3e1;
+    --accent: #1f6f8b;
+    --accent-soft: #e3eff3;
+    --signal: #d9482b;
+    --signal-soft: #fbe9e4;
+    --good: #168f65;
+    --good-soft: #e2f3ec;
+    --shadow: 0 1px 2px rgba(20,32,43,.06), 0 8px 24px rgba(20,32,43,.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --ground: #0f1a22; --surface: #17242d; --surface-2: #1e2d38;
+      --ink: #eef2f1; --ink-2: #b7c2c9; --muted: #7f8d97; --line: #2a3a45;
+      --accent: #5fb3cf; --accent-soft: #163040; --signal: #ff7a5c; --signal-soft: #3a1f19;
+      --good: #3fcf9a; --good-soft: #143528;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --ground: #0f1a22; --surface: #17242d; --surface-2: #1e2d38;
+    --ink: #eef2f1; --ink-2: #b7c2c9; --muted: #7f8d97; --line: #2a3a45;
+    --accent: #5fb3cf; --accent-soft: #163040; --signal: #ff7a5c; --signal-soft: #3a1f19;
+    --good: #3fcf9a; --good-soft: #143528;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--ground); color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 16px; line-height: 1.55;
+    padding-block: 0 64px; padding-inline: 16px;
+  }
+  a { color: var(--accent); }
+  h1, h2, h3, h4 { font-family: "Bitter", Georgia, "Times New Roman", serif; text-wrap: balance; line-height: 1.15; margin: 0; }
+  h1 { font-size: clamp(30px, 4.2vw, 46px); font-weight: 700; letter-spacing: -0.01em; }
+  h2 { font-size: clamp(24px, 3vw, 32px); font-weight: 700; }
+  h3 { font-size: 20px; font-weight: 600; }
+  h4 { font-size: 16px; font-weight: 600; font-family: "IBM Plex Sans", system-ui, sans-serif; }
+  p { margin: 0; }
+  .eyebrow { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+  code, .mono { font-family: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace; font-size: .92em; }
+  code { background: var(--surface-2); padding: 1px 6px; border-radius: 4px; }
+
+  .shell { max-width: 1240px; margin: 0 auto; display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 40px; }
+  @media (max-width: 1000px) { .shell { grid-template-columns: minmax(0, 1fr); gap: 24px; } .index { display: none; } }
+
+  .index { position: sticky; top: 24px; align-self: start; padding-top: 40px; display: flex; flex-direction: column; gap: 4px; }
+  .index a { display: block; padding: 6px 10px; border-radius: 6px; color: var(--ink-2); text-decoration: none; font-size: 14px; border-left: 2px solid transparent; }
+  .index a:hover, .index a:focus-visible { background: var(--surface-2); color: var(--ink); outline: none; }
+  .index .group { margin-top: 14px; }
+
+  main { display: flex; flex-direction: column; gap: 56px; padding-top: 40px; min-width: 0; }
+  .masthead { display: flex; flex-direction: column; gap: 14px; padding-bottom: 28px; border-bottom: 2px solid var(--ink); }
+  .masthead .meta { display: flex; flex-wrap: wrap; gap: 8px 22px; color: var(--ink-2); font-size: 14px; }
+  .masthead .lede { max-width: 72ch; font-size: 18px; color: var(--ink-2); }
+
+  section { display: flex; flex-direction: column; gap: 22px; scroll-margin-top: 20px; }
+  .section-head { display: flex; flex-direction: column; gap: 6px; }
+  .prose { max-width: 72ch; display: flex; flex-direction: column; gap: 12px; }
+  .prose li { margin-bottom: 6px; }
+
+  .message { border-left: 4px solid var(--accent); background: var(--accent-soft); padding: 14px 18px; border-radius: 0 8px 8px 0; max-width: 78ch; }
+  .message strong { font-family: "Bitter", serif; }
+  .warn { border-left-color: var(--signal); background: var(--signal-soft); }
+
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+  .kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; }
+  .kpi .n { font-family: "Bitter", serif; font-size: 30px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; color: var(--accent); }
+  .kpi .n.signal { color: var(--signal); }
+  .kpi .n.good { color: var(--good); }
+  .kpi .l { font-size: 13px; color: var(--ink-2); }
+  .kpi .s { font-size: 12px; color: var(--muted); }
+
+  figure { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px; }
+  figure img { width: 100%; max-width: 100%; height: auto; display: block; border-radius: 4px; }
+  figcaption { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; font-size: 13px; color: var(--ink-2); }
+  figcaption .file { color: var(--muted); }
+  .slide-tag { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); background: var(--accent-soft); padding: 2px 8px; border-radius: 999px; font-weight: 600; white-space: nowrap; }
+  .fig-pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 14px; }
+
+  .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-weight: 600; color: var(--ink-2); font-size: 12.5px; letter-spacing: .04em; text-transform: uppercase; background: var(--surface-2); }
+  tr:last-child td { border-bottom: none; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  td.hi { font-weight: 600; }
+  .flip { color: var(--signal); font-weight: 600; }
+  .win { color: var(--good); font-weight: 600; }
+  .pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+  .pill.win { background: var(--good-soft); }
+  .pill.tie { background: var(--surface-2); color: var(--ink-2); }
+  .pill.flip { background: var(--signal-soft); }
+
+  .qa { display: flex; flex-direction: column; gap: 10px; max-width: 78ch; }
+  .qa details { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 16px; }
+  .qa summary { cursor: pointer; font-weight: 600; font-family: "Bitter", serif; }
+  .qa summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+  .qa p { margin-top: 8px; color: var(--ink-2); }
+
+  .dont { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; }
+  .dont div { background: var(--signal-soft); border-radius: 8px; padding: 10px 14px; font-size: 14px; }
+  .foot { color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); padding-top: 18px; }
+  @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+
+<div class="shell">
+  <nav class="index" aria-label="Report sections">
+    <span class="eyebrow">Lead numbers</span>
+    <a href="#lead">Five numbers</a>
+    <span class="eyebrow group">SIH slides</span>
+    <a href="#s1">1 · Title</a>
+    <a href="#s2">2 · Proposed solution</a>
+    <a href="#s3">3 · Technical approach</a>
+    <a href="#s4">4 · Feasibility &amp; viability</a>
+    <a href="#s5">5 · Impact &amp; benefits</a>
+    <a href="#s6">6 · References</a>
+    <span class="eyebrow group">Appendix</span>
+    <a href="#numbers">Every number</a>
+    <a href="#qa">Judge Q&amp;A</a>
+    <a href="#dont">What not to claim</a>
+  </nav>
+
+  <main>
+    <header class="masthead">
+      <span class="eyebrow">Smart India Hackathon 2026 · SIH26138 · Egreen Quanta</span>
+      <h1>Green Fleet Optimizer — Results for the Idea Submission</h1>
+      <p class="lede">Quantum-inspired fuel consumption prediction and green fleet optimization. Every figure on this page is read from <code>artifacts/*.json</code> or recomputed with a fixed seed — nothing is typed from memory, so the deck cannot drift from the code.</p>
+      <div class="meta">
+        <span><strong>Data:</strong> EU MRV 2018–2025, 106,922 ship-years, real and audited</span>
+        <span><strong>Tests:</strong> 399 passing</span>
+        <span><strong>Charts:</strong> 14, at 300 dpi, sized for 16:9</span>
+      </div>
+    </header>
+
+    <section id="lead">
+      <div class="section-head"><span class="eyebrow">If a judge reads nothing else</span><h2>Five numbers to lead with</h2></div>
+      <div class="kpis">
+        <div class="kpi"><span class="n">106,922</span><span class="l">real ship-years, 25,967 ships</span><span class="s">EU MRV regulatory filings, third-party verified. No synthetic rows.</span></div>
+        <div class="kpi"><span class="n signal">+40%</span><span class="l">grey ammonia vs diesel, lifecycle</span><span class="s">A stack-only tool scores it −100%. The sign flips.</span></div>
+        <div class="kpi"><span class="n">19.9%</span><span class="l">MAPE on 6,263 ships never seen</span><span class="s">R² 0.603 · leakage-safe · 80% intervals cover 80.0%</span></div>
+        <div class="kpi"><span class="n good">30 / 30</span><span class="l">seeds hit the proven optimum</span><span class="s">Beats NSGA-II at 60 vessels, p = 0.004</span></div>
+        <div class="kpi"><span class="n">2035</span><span class="l">electric tugs beat diesel on CO₂</span><span class="s">…but remove 35.6 t NOx per tug per year from day one</span></div>
+      </div>
+      <div class="message"><strong>The fifth number wins the room.</strong> It is specific, uncomfortable, and obviously not sales copy — which makes every other claim on this page more credible to a government audience.</div>
+    </section>
+
+    <section id="s1">
+      <div class="section-head"><span class="eyebrow">Slide 1</span><h2>Title</h2></div>
+      <div class="table-wrap"><table>
+        <tr><th>Field</th><th>Value</th></tr>
+        <tr><td>Problem Statement ID</td><td class="hi">SIH26138</td></tr>
+        <tr><td>Problem Statement Title</td><td class="hi">Quantum-Inspired Fuel Consumption Prediction and Green Fleet Optimization</td></tr>
+        <tr><td>Organisation</td><td>Egreen Quanta</td></tr>
+        <tr><td>Theme</td><td>Transportation &amp; Logistics <span class="mono" style="color:var(--muted)">(confirm on portal)</span></td></tr>
+        <tr><td>PS Category</td><td>Software</td></tr>
+        <tr><td>Tagline</td><td><em>India's first sovereign, quantum-ready planner that decides which vessels, which fuels, and which speeds — not just which route.</em></td></tr>
+      </table></div>
+    </section>
+
+    <section id="s2">
+      <div class="section-head"><span class="eyebrow">Slide 2</span><h2>Proposed solution</h2></div>
+      <div class="prose">
+        <p><strong>The problem, in our words.</strong> Ports and coastal operators must decide which ships to buy, which fuels to commit to, how fast to sail, and when — under cargo demand, schedules, emission caps, and fuel that is only bunkerable at some Indian ports in some years. Twenty ships, four fuels and five speed bands is ~10²⁰ combinations. ZeroNorth, Wärtsilä FOS and DeepSea optimise <em>one voyage of one ship</em> and count only funnel CO₂. Nobody decides the fleet.</p>
+        <p><strong>The solution, in one sentence.</strong> A decision-support system with two engines: a physics-informed fuel predictor trained on 26,000 real ships, and a quantum-inspired fleet optimizer that outputs a Pareto front of feasible plans under well-to-wake lifecycle emissions and Indian port constraints.</p>
+      </div>
+      <figure>
+        <img src="charts/01_stack_vs_lifecycle.png" alt="Bar chart comparing stack-only and lifecycle emissions per fuel; grey methanol, grey ammonia and grey hydrogen flip from apparent improvements to increases">
+        <figcaption><span>Three fuels change sign once the whole lifecycle is counted. Grey ammonia: stack-only −100%, truth +40%.</span><span class="slide-tag">Use on slides 2 · 5</span></figcaption>
+      </figure>
+      <h3>What is unique — four things nobody else has</h3>
+      <div class="table-wrap"><table>
+        <tr><th>Uniqueness</th><th>Proof point</th><th>Chart</th></tr>
+        <tr><td><strong>Lifecycle, not funnel</strong> — CH₄ slip, N₂O, pilot fuel, grey/blue/green pathways</td><td>Grey ammonia <span class="flip">+40%</span> · grey methanol <span class="flip">+10%</span> · grey hydrogen <span class="flip">+9%</span> — all scored as improvements by a stack-only model</td><td>01</td></tr>
+        <tr><td><strong>Measured, not defaulted</strong> — slip from 745 measured LNG carrier ship-years</td><td>Default 3.1% says LNG is +5.5% <em>worse</em>; measured 1.72% says −3.9% <em>better</em>. They disagree on the sign.</td><td>02</td></tr>
+        <tr><td><strong>India-specific</strong> — 8 ports, year-indexed bunkering, CEA grid, Harit Sagar, GTTP, Mormugao</td><td>Electric tug: +20% CO₂ in 2030, −4% in 2035, crossover 2035 — while removing 35.6 t NOx/yr immediately</td><td>03 · 04</td></tr>
+        <tr><td><strong>Quantum-inspired and quantum-ready</strong> — Q-bit + rotation gates, QPSO, QUBO</td><td>30/30 exact vs proven MILP · beats NSGA-II at 60 vessels, p = 0.004 · QUBO ground state matches CP-SAT exactly</td><td>09 · 11</td></tr>
+      </table></div>
+      <h3>Against the competition</h3>
+      <div class="table-wrap"><table>
+        <tr><th>Capability</th><th>ZeroNorth / Wärtsilä / DeepSea</th><th>This tool</th></tr>
+        <tr><td>Decision level</td><td>one voyage, one vessel</td><td class="hi">fleet mix, fuel, speed, over years</td></tr>
+        <tr><td>Emissions basis</td><td>tank-to-wake CO₂</td><td class="hi">well-to-wake CO₂e: CH₄ + N₂O + pilot + upstream</td></tr>
+        <tr><td>Methane slip</td><td>a default, if at all</td><td class="hi">measured from 745 ship-years</td></tr>
+        <tr><td>Grey vs green pathways</td><td>not modelled</td><td class="hi">modelled; grey ammonia comes out worse than diesel</td></tr>
+        <tr><td>Local air pollutants</td><td>not reported</td><td class="hi">NOx / SOx / PM tracked separately</td></tr>
+        <tr><td>Indian port fuel availability</td><td>not modelled</td><td class="hi">year-indexed, 8 major ports</td></tr>
+        <tr><td>Indian grid carbon</td><td>not modelled</td><td class="hi">CEA factor + T&amp;D losses + decarbonisation path</td></tr>
+        <tr><td>Harit Sagar / GTTP</td><td>none</td><td class="hi">KPI glide path, on/off-track</td></tr>
+        <tr><td>Quantum-readiness</td><td>none</td><td class="hi">QUBO formulation, verified</td></tr>
+        <tr><td>Data residency</td><td>foreign SaaS</td><td class="hi">on-premises, offline-capable</td></tr>
+      </table></div>
+      <div class="message">Say it this way: <em>"Those are strong products doing a different job. They optimise a voyage. Nothing in them decides which vessels to buy and which fuels to commit to — which is the decision a port under GTTP and Harit Sagar actually faces."</em></div>
+      <figure>
+        <img src="charts/12_pareto_front.png" alt="Pareto front of 14 fleet plans trading annual cost against lifecycle emissions, from all-fossil to 100% e-methanol">
+        <figcaption><span>A Pareto front, not one answer: −91% GHG for +45% cost, with 14 feasible mixed-fuel plans between. Coastal scenario, 2047.</span><span class="slide-tag">Use on slides 2 · 5</span></figcaption>
+      </figure>
+    </section>
+
+    <section id="s3">
+      <div class="section-head"><span class="eyebrow">Slide 3</span><h2>Technical approach</h2></div>
+      <figure>
+        <img src="charts/14_architecture.png" alt="Architecture diagram: data, fuel predictor, well-to-wake engine, India layer, quantum-inspired optimizer, decision support">
+        <figcaption><span>End-to-end pipeline. Every solver evaluates through one problem object, so the benchmark compares methods, not problems.</span><span class="slide-tag">Use on slide 3</span></figcaption>
+      </figure>
+      <div class="table-wrap"><table>
+        <tr><th>Step</th><th>What happens</th><th class="num">Key number</th></tr>
+        <tr><td><strong>1 · Data</strong></td><td>EU MRV 2018–2025 from EMSA's public API, version-pinned with SHA-256. Twelve data-quality gates: units, outliers, schema drift, duplicates.</td><td class="num">100,528 usable of 106,922 (94.0%)</td></tr>
+        <tr><td><strong>2 · Predictor</strong></td><td>Physics core <span class="mono">P ∝ Δ^(2/3)·V³</span> imposed from naval architecture; XGBoost learns the ship-specific level from leakage-free design attributes only. Predicts energy (MJ), converts to fuel mass per fuel via LHV.</td><td class="num">19.9% MAPE · R² 0.603</td></tr>
+        <tr><td><strong>3 · Emissions</strong></td><td>Well-to-tank + CO₂ + CH₄ (slip) + N₂O + pilot fuel, per pathway, on shaft energy so fuels and batteries compare fairly.</td><td class="num">grey ammonia +40%</td></tr>
+        <tr><td><strong>4 · Constraints</strong></td><td>Fuel bunkerable at every port on the route (year-indexed); tank range; cargo displaced by tank volume; shore power needs port and vessel both fitted.</td><td class="num">H₂ retrofit range 7% of diesel</td></tr>
+        <tr><td><strong>5 · Optimizer</strong></td><td>Q-bit strings + Han–Kim rotation gates for deploy/route/fuel; QPSO for continuous speed; Pareto archive with constrained domination; repair, not penalty.</td><td class="num">30/30 exact · +19% HV over greedy at 60 vessels</td></tr>
+        <tr><td><strong>6 · Verification</strong></td><td>Exact CP-SAT MILP on small instances; NSGA-II, greedy, random at equal budget; 30 seeds; Wilcoxon; one shared hypervolume reference point.</td><td class="num">399 tests</td></tr>
+      </table></div>
+      <div class="prose">
+        <h3>The encoding — judges ask</h3>
+        <p>Per vessel: <span class="mono">[deploy bit | route bits | fuel bits]</span>, concatenated across the fleet. Each bit is a Q-bit — a pair of amplitudes <span class="mono">(cos θ, sin θ)</span> in superposition. Observation collapses it; the rotation gate <span class="mono">θ ← θ ± δ</span> biases amplitudes toward the best solution, but only where an individual disagrees with a solution that beat it (Han &amp; Kim 2002). Route and fuel bits decode modulo the option count, so every bit pattern is a valid plan. Speed is continuous and carried by QPSO — the hybrid encoding. A 60-vessel, 6-route, 4-fuel instance is 360 Q-bits.</p>
+        <h3>The rotation angle — judges ask</h3>
+        <p><span class="mono">δ = 0.03π · n_bits / n_generations</span>, scaled to problem size and budget and calibrated by sweep, not inherited. A fixed angle tuned on a 14-bit problem lost two orders of magnitude of hypervolume on a 360-bit fleet; the size-scaled rule satisfies the 2-, 12- and 60-vessel instances with one setting.</p>
+      </div>
+      <div class="fig-pair">
+        <figure>
+          <img src="charts/11_qiea_verification.png" alt="Bar chart of exact-optimum hit rate by problem size, QIEA versus random search">
+          <figcaption><span>Verified against brute force: exact optimum in 100% of seeds up to 2⁸ states.</span><span class="slide-tag">Slides 3 · 4</span></figcaption>
+        </figure>
+        <figure>
+          <img src="charts/13_where_quantum_inspired_pays_off.png" alt="Bar chart of improvement over the best baseline across six problems; ties and wins both shown">
+          <figcaption><span>Where quantum-inspired search pays off — and where it ties. Reported either way.</span><span class="slide-tag">Slides 3 · 4</span></figcaption>
+        </figure>
+      </div>
+      <figure>
+        <img src="charts/08_slow_steaming_by_class.png" alt="Grouped bars of fuel saved per day and per mile when slowing from 14 to 12 knots, by vessel class">
+        <figcaption><span>Slow steaming saves 23.9%/mile on a bulk carrier and 0.1%/mile on a cruise ship — a universal cube law cannot express this.</span><span class="slide-tag">Slides 3 · 5</span></figcaption>
+      </figure>
+      <div class="prose"><p><strong>Tech stack.</strong> Python 3.10 · NumPy · pandas · scikit-learn · XGBoost (monotone constraints) · pymoo (NSGA-II) · OR-Tools CP-SAT (exact MILP) · SciPy (Wilcoxon) · own QIEA / QPSO / QUBO in NumPy · pytest (399 tests) · ruff · uv. Planned: FastAPI, React + Plotly, PostgreSQL, Docker — on-premises, offline.</p></div>
+    </section>
+
+    <section id="s4">
+      <div class="section-head"><span class="eyebrow">Slide 4</span><h2>Feasibility &amp; viability</h2></div>
+      <div class="kpis">
+        <div class="kpi"><span class="n">19.9%</span><span class="l">MAPE, unseen vessels</span><span class="s">medAPE 13.4% · R² 0.603</span></div>
+        <div class="kpi"><span class="n">24.4%</span><span class="l">MAPE, unseen years 2024–25</span><span class="s">the strictest split</span></div>
+        <div class="kpi"><span class="n">80.0%</span><span class="l">empirical interval coverage</span><span class="s">against a nominal 80%</span></div>
+        <div class="kpi"><span class="n">54 s</span><span class="l">200 vessels, 10²⁷⁹ combinations</span><span class="s">feasible plan found every run</span></div>
+      </div>
+      <div class="fig-pair">
+        <figure>
+          <img src="charts/05_model_accuracy.png" alt="MAPE and R-squared for four models on unseen vessels; physics plus XGBoost leads">
+          <figcaption><span>Leakage-safe: 25% of ships fully held out, zero IMO overlap.</span><span class="slide-tag">Slide 4</span></figcaption>
+        </figure>
+        <figure>
+          <img src="charts/07_cold_start.png" alt="Warm versus cold-start rows: MAPE, R-squared and interval coverage">
+          <figcaption><span>The model knows what it doesn't know: cold rows get wide, honest intervals.</span><span class="slide-tag">Slide 4</span></figcaption>
+        </figure>
+      </div>
+      <figure>
+        <img src="charts/09_optimizer_benchmark.png" alt="Hypervolume of QIEA+QPSO, NSGA-II, greedy and random on 12-vessel and 60-vessel instances with p-values">
+        <figcaption><span>Equal evaluation budget, shared reference point, Wilcoxon paired by seed. Tie at 12 vessels; QIEA better than every baseline at 60, p ≤ 0.004.</span><span class="slide-tag">Slides 3 · 4</span></figcaption>
+      </figure>
+      <div class="fig-pair">
+        <figure>
+          <img src="charts/06_per_vessel_class.png" alt="MAPE per vessel class on unseen vessels; ro-pax and offshore visibly weaker">
+          <figcaption><span>Accuracy per class — the weak ones shown, not averaged away.</span><span class="slide-tag">Slide 4</span></figcaption>
+        </figure>
+        <figure>
+          <img src="charts/10_scalability.png" alt="Runtime versus fleet size from 10 to 200 vessels on a log axis">
+          <figcaption><span>Runtime grows roughly linearly with fleet size.</span><span class="slide-tag">Slide 4</span></figcaption>
+        </figure>
+      </div>
+      <h3>Viability — a real programme, a real first user</h3>
+      <div class="prose">
+        <ul>
+          <li><strong>Green Tug Transition Programme.</strong> Deendayal, JNPA, Visakhapatnam and V.O. Chidambaranar have placed electric-tug work orders. Each faces exactly our fleet-mix, fuel and duty-cycle decision.</li>
+          <li><strong>Mormugao Port Authority</strong> signed a strategic quantum-technology agreement with Egreen Quanta (July 2026) and runs Harit Shrey, India's first green-ship incentive. Our emission scores plug straight into it — the sponsor's live pilot.</li>
+          <li><strong>Harit Sagar.</strong> Ports must cut emissions per tonne of cargo 30% by 2030 and 70% by 2047. The KPI tracker reports the glide path and on/off-track status.</li>
+          <li><strong>Business model.</strong> Licence to port authorities / MoPSW, on-premises, annual support. Data stays in India.</li>
+        </ul>
+      </div>
+      <h3>Risks, each with a mitigation already built</h3>
+      <div class="table-wrap"><table>
+        <tr><th>Risk</th><th>Mitigation</th></tr>
+        <tr><td>Data scarcity for Indian coastal vessels and tugs — MRV has no ship under 5000 GT</td><td>Physics + vessel-class cold-start path: the model flags what it cannot see and widens intervals (cold rows: 84.2% coverage vs 80% nominal). Tug figures are labelled physics-derived.</td></tr>
+        <tr><td>"Quantum-inspired" is hype</td><td>Benchmarked at equal budget over 30 seeds. We publish the tie (12 vessels, p = 0.14) and the win (60 vessels, p = 0.004). Never claim quantum speedup.</td></tr>
+        <tr><td>Emission factors are uncertain</td><td>Every factor in config with a source and confidence tag. CH₄ and N₂O now measured from 26,621 ship-years. Every result reports its weakest input's confidence.</td></tr>
+        <tr><td>Port fuel availability changes fast</td><td>Year-indexed config; "planned" deliberately does not count as available. Specific years are placeholders to confirm with port authorities — stated openly.</td></tr>
+        <tr><td>IMO Net-Zero Framework unsettled</td><td>Policy is a scenario toggle, not code. Harit Sagar and EU rules apply regardless.</td></tr>
+        <tr><td>Coal-heavy grid makes shore power look worse</td><td>Modelled honestly (crossover 2035) and paired with the immediate local air-quality benefit.</td></tr>
+        <tr><td>Live demo failure</td><td>Everything runs offline; pre-computed large scenario; recorded backup.</td></tr>
+      </table></div>
+      <div class="message warn"><strong>Say these before a judge finds them.</strong> Offshore vessels 117.7% MAPE (96% lack a design certificate; flagged cold-start). Ro-pax and passenger 30–34% (hotel-load-dominated). The Pareto front thins above ~50 vessels at a 6,000-evaluation budget. MILP verification is exact for the speed-discretised problem only. Nothing has run on quantum hardware.</div>
+    </section>
+
+    <section id="s5">
+      <div class="section-head"><span class="eyebrow">Slide 5</span><h2>Impact &amp; benefits</h2></div>
+      <div class="fig-pair">
+        <figure>
+          <img src="charts/03_electrification_crossover.png" alt="Line chart of electric versus diesel lifecycle emissions on the Indian grid from 2024 to 2047, crossing in 2035">
+          <figcaption><span>Electrification in India: the carbon benefit arrives with the grid, not the vessel. Crossover 2035.</span><span class="slide-tag">Slide 5</span></figcaption>
+        </figure>
+        <figure>
+          <img src="charts/04_tug_carbon_vs_air_quality.png" alt="Side-by-side bars of annual CO2e and NOx for one harbour tug across fuel options">
+          <figcaption><span>One tug: electrify for air quality now — 35.6 t NOx removed per year — carbon follows the grid.</span><span class="slide-tag">Slide 5</span></figcaption>
+        </figure>
+      </div>
+      <div class="table-wrap"><table>
+        <tr><th>Impact</th><th>Number</th><th>Scenario</th></tr>
+        <tr><td><strong>Avoids a wrong procurement</strong></td><td>Stack-only scores grey ammonia at <span class="flip">−100%</span>; the truth is <span class="flip">+40%</span>. A port buying on the wrong column would increase emissions and report reaching zero.</td><td>1 TJ shaft work, AR6 GWP100</td></tr>
+        <tr><td><strong>Local air quality, immediately</strong></td><td>Each electrified harbour tug removes <strong>35.6 t NOx, 1.25 t SOx, 187 kg PM</strong> from the port city per year</td><td>12 TJ/yr tug, Mormugao</td></tr>
+        <tr><td><strong>Carbon on the honest timeline</strong></td><td>Electric tug CO₂: +20% vs diesel in 2030 → −4% in 2035 → −60% in 2047</td><td>CEA grid path</td></tr>
+        <tr><td><strong>Fleet trade-off made visible</strong></td><td><strong>−91% GHG for +45% cost</strong>, with 14 feasible intermediate mixed-fuel plans</td><td>12 vessels, 3 routes, 2047</td></tr>
+        <tr><td><strong>Slow steaming, correctly</strong></td><td>14→12 kn saves 23.9%/mile on a bulk carrier, 0.1%/mile on a cruise ship</td><td>class hotel-load share</td></tr>
+        <tr><td><strong>Harit Sagar tracked</strong></td><td>35% clean-fuel share puts a 1 Mt port <span class="win">on track</span> for −30% by 2030; 85% for −70% by 2047</td><td>tracker output</td></tr>
+        <tr><td><strong>Range reality for hydrogen</strong></td><td>Retrofit range 7% of diesel → tugs and ferries only; 4,842 t of cargo lost on a purpose-built 5,000 nmi tank</td><td>F-04 / F-05</td></tr>
+      </table></div>
+      <figure>
+        <img src="charts/02_methane_slip.png" alt="Two panels: methane slip assumed versus measured, and the resulting LNG emissions relative to diesel">
+        <figcaption><span>The regulatory default and the measured fleet disagree about whether LNG helps at all.</span><span class="slide-tag">Slides 2 · 4</span></figcaption>
+      </figure>
+      <h3>Who benefits</h3>
+      <div class="table-wrap"><table>
+        <tr><th>Beneficiary</th><th>Benefit</th></tr>
+        <tr><td>Port authorities (GTTP)</td><td>A defensible fleet-transition plan with the CO₂ and air-quality cases separated, infrastructure constraints respected</td></tr>
+        <tr><td>Mormugao Port</td><td>Emission scores that plug into Harit Shrey; the sponsor's own pilot site</td></tr>
+        <tr><td>MoPSW / Harit Sagar</td><td>Per-tonne-of-cargo intensity against the 2030 / 2047 targets, per port</td></tr>
+        <tr><td>Coastal &amp; inland operators (Harit Nauka)</td><td>Which vessels, which fuels, which speeds — a Pareto front, not one number</td></tr>
+        <tr><td>National Quantum Mission</td><td>A real maritime problem already formulated as QUBO, ready for domestic hardware</td></tr>
+        <tr><td>Public health in port cities</td><td>Quantified NOx / SOx / PM removal, kept separate from carbon</td></tr>
+      </table></div>
+    </section>
+
+    <section id="s6">
+      <div class="section-head"><span class="eyebrow">Slide 6</span><h2>Research &amp; references</h2></div>
+      <div class="prose">
+        <h4>Data</h4>
+        <ul>
+          <li>EU MRV "Publication of information", EMSA THETIS-MRV — <a href="https://mrv.emsa.europa.eu">mrv.emsa.europa.eu</a> (2018–2025; pinned versions in <code>data/raw/mrv/manifest.json</code>)</li>
+          <li>CEA CO₂ Baseline Database for the Indian Power Sector</li>
+        </ul>
+        <h4>Standards and regulation</h4>
+        <ul>
+          <li>IMO MEPC.308(73) — 2018 EEDI Guidelines (LHV and C<sub>f</sub> values)</li>
+          <li>IMO Fourth GHG Study 2020 — our measured CH₄ reproduces its default exactly</li>
+          <li>FuelEU Maritime Annex I/II — well-to-tank defaults, C<sub>slip</sub> values</li>
+          <li>IPCC AR5 / AR6 WG1 — GWP100; EMSA's use of AR5 recovered exactly from 28,125 filings</li>
+          <li>Harit Sagar Green Port Guidelines; Green Tug Transition Programme — MoPSW</li>
+          <li>PIB: Mormugao Port Authority – Egreen Quanta Strategic Quantum Technology agreement, July 2026</li>
+          <li>IMO: Net-Zero Framework talks to resume in 2026</li>
+        </ul>
+        <h4>Methods</h4>
+        <ul>
+          <li>Han &amp; Kim (2002), <em>Quantum-inspired evolutionary algorithm for a class of combinatorial optimization</em>, IEEE TEC</li>
+          <li>Sun, Feng &amp; Xu (2004), <em>Particle swarm optimization with particles having quantum behavior</em>, IEEE CEC</li>
+          <li>Deb et al. (2002), NSGA-II · Google OR-Tools CP-SAT</li>
+          <li>ScienceDirect: <em>Improved quantum genetic algorithm for ship speed optimization</em></li>
+        </ul>
+        <h4>Competitors reviewed</h4>
+        <p>ZeroNorth voyage optimisation · Wärtsilä Fleet Optimisation Solution · DNV Alternative Fuels Insight · Maritime Executive on quantum port scheduling (Feb 2026)</p>
+      </div>
+    </section>
+
+    <section id="numbers">
+      <div class="section-head"><span class="eyebrow">Appendix A</span><h2>Every number, with its source</h2></div>
+      <h3>Prediction model — <span class="mono">artifacts/evaluation.json</span>, unseen vessels</h3>
+      <div class="table-wrap"><table>
+        <tr><th>Model</th><th class="num">MAE</th><th class="num">RMSE</th><th class="num">MAPE</th><th class="num">medAPE</th><th class="num">R²</th><th class="num">80% cov</th></tr>
+        <tr><td>class mean (naive)</td><td class="num">1528.5</td><td class="num">2780.8</td><td class="num">32.6%</td><td class="num">23.1%</td><td class="num">0.354</td><td class="num">80.3%</td></tr>
+        <tr><td>ridge (log)</td><td class="num">1482.6</td><td class="num">2724.9</td><td class="num">31.5%</td><td class="num">22.2%</td><td class="num">0.379</td><td class="num">80.4%</td></tr>
+        <tr><td class="hi">Physics + XGBoost</td><td class="num hi">958.7</td><td class="num hi">2178.7</td><td class="num hi">19.9%</td><td class="num hi">13.4%</td><td class="num hi">0.603</td><td class="num">80.0%</td></tr>
+        <tr><td>Physics + XGBoost, monotone</td><td class="num">995.4</td><td class="num">2220.0</td><td class="num">20.6%</td><td class="num">14.0%</td><td class="num">0.588</td><td class="num">80.1%</td></tr>
+      </table></div>
+      <div class="prose"><p>Train 75,423 rows / 18,788 ships → test 25,105 rows / 6,263 ships. Unseen years (2024–25): best 24.4%. Warm rows (n = 23,652): 19.3% MAPE, R² 0.697. Cold rows (n = 1,453): 41.8%, coverage 84.2%. Per class: vehicle carrier 14.1 · bulk 15.2 · chemical tanker 16.6 · oil tanker 18.3 · LNG carrier 19.9 · container 23.7 · ro-pax 34.3 · offshore 117.7 (cold). Quantum-inspired hyperparameter tuning: a tie (QPSO 20.679 vs random 20.728 vs untuned 20.875) — reported as such.</p></div>
+
+      <h3>Emissions — <span class="mono">artifacts/emissions_demo.json</span>, per TJ shaft work, AR6 GWP100</h3>
+      <div class="table-wrap"><table>
+        <tr><th>Fuel / pathway</th><th class="num">Stack-only tCO₂e</th><th class="num">Lifecycle tCO₂e</th><th class="num">Stack says</th><th class="num">Truth</th></tr>
+        <tr><td>MGO fossil</td><td class="num">75.1</td><td class="num">90.7</td><td class="num">0%</td><td class="num">0%</td></tr>
+        <tr><td>LNG fossil</td><td class="num">57.3</td><td class="num">87.1</td><td class="num">−24%</td><td class="num hi">−4%</td></tr>
+        <tr><td>Methanol grey</td><td class="num">66.3</td><td class="num">100.2</td><td class="num">−12%</td><td class="num flip">+10%</td></tr>
+        <tr><td>E-methanol</td><td class="num">0.0</td><td class="num">8.6</td><td class="num">−100%</td><td class="num">−91%</td></tr>
+        <tr><td>Ammonia grey</td><td class="num">0.0</td><td class="num">126.5</td><td class="num">−100%</td><td class="num flip">+40%</td></tr>
+        <tr><td>Ammonia blue</td><td class="num">0.0</td><td class="num">44.7</td><td class="num">−100%</td><td class="num">−51%</td></tr>
+        <tr><td>Ammonia green</td><td class="num">0.0</td><td class="num">18.6</td><td class="num">−100%</td><td class="num">−79%</td></tr>
+        <tr><td>Hydrogen grey</td><td class="num">0.0</td><td class="num">99.1</td><td class="num">−100%</td><td class="num flip">+9%</td></tr>
+        <tr><td>Hydrogen green</td><td class="num">0.0</td><td class="num">7.2</td><td class="num">−100%</td><td class="num">−92%</td></tr>
+      </table></div>
+      <div class="prose"><p>Methane slip: FuelEU default 3.10% → LNG +5.5% vs diesel; measured median 1.72% → −3.9%; best engine 0.20% → −14.3%. Measured spread p25 0.63%, p95 2.97% (745 ship-years). Conventional-fuel CH₄ 0.050 g/kg and N₂O 0.180 g/kg measured across 26,621 ship-years. EU GWP set recovered exactly: CH₄ 28.00, N₂O 265.00, residual 1.6×10⁻¹⁴. Electric vs diesel (201.5): 2026 +38% · 2030 +20% · 2035 −4% · 2040 −28% · 2047 −60%. Harbour tug 12 TJ/yr: diesel 2,418 tCO₂e / 35,597 kg NOx / 1,249 kg SOx / 187 kg PM; electric 2030 2,910 / 0 / 0 / 0; electric 2035 2,328 / 0 / 0 / 0. Hydrogen retrofit range 374 nmi vs 5,000 for MGO (7%); cargo displaced on a purpose-built 5,000 nmi tank: 4,842 t.</p></div>
+
+      <h3>Optimizer — <span class="mono">artifacts/optimizer_benchmark.json</span></h3>
+      <div class="prose"><p><strong>Q-08:</strong> MILP proven optimum INR 108,523,810 · QIEA+QPSO 30/30 exact, mean and worst gap 0.0000%.</p></div>
+      <div class="table-wrap"><table>
+        <tr><th>Instance</th><th>Algorithm</th><th class="num">HV mean</th><th class="num">HV std</th><th class="num">Front</th><th class="num">Time</th><th class="num">Feasible</th><th>vs QIEA</th></tr>
+        <tr><td rowspan="4">12 vessels<br><span class="mono" style="color:var(--muted)">2.33×10¹³ · 30 seeds</span></td><td class="hi">QIEA+QPSO</td><td class="num hi">4.195e21</td><td class="num">4.59e20</td><td class="num">6.4</td><td class="num">2.87 s</td><td class="num">30/30</td><td>—</td></tr>
+        <tr><td>NSGA-II</td><td class="num">3.938e21</td><td class="num">6.67e20</td><td class="num">6.2</td><td class="num">2.25 s</td><td class="num">30/30</td><td><span class="pill tie">tie · p = 0.14</span></td></tr>
+        <tr><td>greedy</td><td class="num">1.710e21</td><td class="num">8.0e05</td><td class="num">3.0</td><td class="num">0.05 s</td><td class="num">30/30</td><td><span class="pill win">QIEA better · p &lt; 0.001</span></td></tr>
+        <tr><td>random</td><td class="num">6.346e20</td><td class="num">6.24e20</td><td class="num">1.7</td><td class="num">1.82 s</td><td class="num">30/30</td><td><span class="pill win">QIEA better · p &lt; 0.001</span></td></tr>
+        <tr><td rowspan="4">60 vessels<br><span class="mono" style="color:var(--muted)">7.52×10⁸³ · 10 seeds</span></td><td class="hi">QIEA+QPSO</td><td class="num hi">3.885e26</td><td class="num">1.07e25</td><td class="num">4.8</td><td class="num">15.3 s</td><td class="num">10/10</td><td>—</td></tr>
+        <tr><td>greedy</td><td class="num">3.602e26</td><td class="num">7.2e10</td><td class="num">2.0</td><td class="num">1.0 s</td><td class="num">10/10</td><td><span class="pill win">QIEA better · p = 0.002</span></td></tr>
+        <tr><td>NSGA-II</td><td class="num">3.260e26</td><td class="num">4.57e25</td><td class="num">2.8</td><td class="num">8.6 s</td><td class="num">10/10</td><td><span class="pill win">QIEA better · p = 0.004</span></td></tr>
+        <tr><td>random</td><td class="num">8.381e24</td><td class="num">1.55e25</td><td class="num">0.6</td><td class="num">11.9 s</td><td class="num">6/10</td><td><span class="pill win">QIEA better · p = 0.002</span></td></tr>
+      </table></div>
+      <div class="prose"><p>Scalability (3 seeds, 6,000 evals): 10 vessels 5.8 s · 25 → 9.4 s · 50 → 14.6 s · 100 → 23.7 s · 200 (3.9×10²⁷⁹) → 53.7 s, feasible 3/3 at every size. QUBO: ground state matches CP-SAT exactly; penalty weight neither too low nor too high. QIEA vs random on knapsack with a known optimum: 100% vs 63% at 4 bits, 100% vs 53% at 8 bits, 96% vs 26% at 12 bits.</p></div>
+    </section>
+
+    <section id="qa">
+      <div class="section-head"><span class="eyebrow">Appendix C</span><h2>Judge questions, with the number</h2></div>
+      <div class="qa">
+        <details><summary>"Is this actual quantum computing?"</summary><p>No. Quantum-<em>inspired</em>: classical algorithms using superposition-style Q-bit encoding and rotation-gate updates, on ordinary hardware. The discrete core is also written as a QUBO, verified to match the exact optimum, so it can move to annealers or National Quantum Mission hardware when practical. Never say "quantum speedup".</p></details>
+        <details><summary>"Why not just use a normal GA?"</summary><p>We benchmarked exactly that. At 12 vessels it is a tie (p = 0.14). At 60 vessels the quantum-inspired optimizer beats NSGA-II with p = 0.004 and greedy with p = 0.002 at equal budget. The advantage appears when the space is large and rugged — chart 13 shows the ties too.</p></details>
+        <details><summary>"Explain your encoding."</summary><p>One Q-bit per binary decision; route and fuel by binary expansion, decoded modulo the option count so every string is valid; speed continuous via QPSO. Chart 14 and the Slide 3 text.</p></details>
+        <details><summary>"What's the rotation angle and how did you choose it?"</summary><p>0.03π · n_bits / n_generations, calibrated by a documented sweep across three instance sizes. A fixed angle from a small problem lost 100× hypervolume on a large one — we show the failure.</p></details>
+        <details><summary>"Have you run on a real quantum device?"</summary><p>No. The QUBO's ground state matches CP-SAT on small instances, classically. That is the readiness claim, no more.</p></details>
+        <details><summary>"How is this different from ZeroNorth / Wärtsilä?"</summary><p>They optimise one voyage. We decide which ships, which fuels, which speeds across a fleet over years, with lifecycle emissions and Indian port constraints. Different decision level.</p></details>
+        <details><summary>"Where does your data come from?"</summary><p>EU MRV — 106,922 verified regulatory filings, 25,967 ships, 2018–2025, from EMSA's public API, version-pinned. Plus CEA grid data and IMO / FuelEU factors, each tagged with a confidence level. No synthetic rows.</p></details>
+        <details><summary>"How accurate is your fuel prediction?"</summary><p>19.9% MAPE on 6,263 ships never seen in training, R² 0.603, leakage-safe split by vessel. Warm rows 19.3%; cold rows (41.8%) reported separately with 84% interval coverage.</p></details>
+        <details><summary>"Isn't LNG a clean fuel?"</summary><p>Only partly. Measured methane slip across 745 LNG carrier ship-years is 1.72% of fuel — with methane at 28–30× CO₂ that erases most of LNG's 24% combustion advantage, leaving −4%. The regulatory default (3.1%) would even make it worse than diesel.</p></details>
+        <details><summary>"Is shore power actually green in India?"</summary><p>On carbon, not until ~2035 — the grid is too coal-heavy for a 45%-efficient marine diesel to lose. On local air quality, immediately: 35.6 t NOx per tug per year off the quayside. We show both.</p></details>
+        <details><summary>"What about ships with no sensors?"</summary><p>Physics-informed model with vessel-class baselines; the cold-start path flags them and widens the interval. Tugs are handled exactly this way.</p></details>
+        <details><summary>"Who would actually use this?"</summary><p>GTTP ports — Deendayal, JNPA, Visakhapatnam, V.O. Chidambaranar have placed electric-tug orders. First case: Mormugao, the sponsor's pilot site, plugging into Harit Shrey.</p></details>
+        <details><summary>"How does this scale to 1,000 vessels?"</summary><p>Runtime is roughly linear: 200 vessels in 54 s at 6,000 evaluations. Front density thins above 50 at that budget; more budget fixes it, and the cost is tabled.</p></details>
+      </div>
+    </section>
+
+    <section id="dont">
+      <div class="section-head"><span class="eyebrow">Appendix D</span><h2>What not to claim</h2></div>
+      <div class="dont">
+        <div>Never "quantum" alone — always "quantum-inspired". No speedup, no hardware execution.</div>
+        <div>The 12-vessel benchmark is a tie (p = 0.14), not a win.</div>
+        <div>Port fuel-availability years are placeholders pending port-authority confirmation.</div>
+        <div>Tug figures are physics-derived; no tug is in MRV.</div>
+        <div>The 11% within-ship floor is a lower bound for any method, not a target for unseen vessels.</div>
+        <div>Never add NOx / SOx / PM into a CO₂e total.</div>
+        <div>Offshore and ro-pax are known weak classes; do not cite them as representative.</div>
+        <div>Every number must carry its scenario. "Up to X%" with no source loses the room.</div>
+      </div>
+      <p class="foot">Regenerate everything: <code>scripts/evaluate_model.py --calibrate-intervals</code> · <code>scripts/emissions_demo.py</code> · <code>scripts/benchmark_optimizer.py --seeds 30</code> · <code>scripts/make_charts.py</code>. Full text with sources in <code>docs/REPORT_FOR_PPT.md</code>.</p>
+    </section>
+  </main>
+</div>

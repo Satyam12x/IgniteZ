@@ -1,0 +1,186 @@
+# Controlled vocabulary for vessel classes (D-12) plus per-class physical reference
+# values used by the physics core.
+#
+# Two jobs:
+#
+# 1. Map every label a data source might use onto one canonical class. EMSA itself
+#    drifts: "Passenger ship (Cruise Passenger ship)" appears only from 2023 and
+#    "Other ship types (Offshore)" only from 2024, both as refinements of labels
+#    already in use. Unknown labels map to `other` with a warning, never silently.
+#
+# 2. Supply the reference operating point the physics core needs. MRV cannot
+#    identify the speed-fuel relationship (see docs/FINDINGS_PHASE1.md §2), so the
+#    speed response is imposed from naval architecture and anchored at a per-class
+#    typical service speed. These are published typical values, not fitted, and are
+#    tagged provisional accordingly.
+#
+# Units:
+#   typical_service_speed_kn   knots, at normal sea-going service condition
+#   aux_load_share             fraction of total at-sea power that does NOT scale
+#                              with speed (auxiliaries, hotel, reefer, cargo plant)
+#   in_mrv_scope               whether ships of this class appear in EU MRV at all
+
+meta:
+  schema_version: 1
+  source_speeds: >
+    Typical published service speeds by vessel class, consistent with the vessel
+    classes used in the IMO Fourth GHG Study 2020. Indicative class values only:
+    real service speed varies strongly with size within a class, especially for
+    container ships.
+  confidence_speeds: provisional
+  source_aux: >
+    Indicative auxiliary and hotel load shares by class. Reefer and passenger
+    classes are high because refrigeration and hotel load are large and roughly
+    speed-independent.
+  confidence_aux: provisional
+
+classes:
+
+  bulk_carrier:
+    display_name: "Bulk carrier"
+    typical_service_speed_kn: 14.0
+    aux_load_share: 0.06
+    in_mrv_scope: true
+    aliases: ["Bulk carrier", "bulker", "BC", "Bulk Carrier"]
+
+  oil_tanker:
+    display_name: "Oil tanker"
+    typical_service_speed_kn: 14.5
+    aux_load_share: 0.10
+    in_mrv_scope: true
+    aliases: ["Oil tanker", "Oil Tanker", "crude tanker", "product tanker"]
+
+  chemical_tanker:
+    display_name: "Chemical tanker"
+    typical_service_speed_kn: 14.5
+    aux_load_share: 0.10
+    in_mrv_scope: true
+    aliases: ["Chemical tanker", "Chemical Tanker"]
+
+  container_ship:
+    display_name: "Container ship"
+    typical_service_speed_kn: 19.0
+    aux_load_share: 0.08
+    in_mrv_scope: true
+    aliases: ["Container ship", "Container Ship", "containership", "boxship"]
+
+  container_roro:
+    display_name: "Container/ro-ro cargo ship"
+    typical_service_speed_kn: 18.0
+    aux_load_share: 0.10
+    in_mrv_scope: true
+    aliases: ["Container/ro-ro cargo ship", "Container/Ro-Ro cargo ship"]
+
+  general_cargo:
+    display_name: "General cargo ship"
+    typical_service_speed_kn: 13.0
+    aux_load_share: 0.08
+    in_mrv_scope: true
+    aliases: ["General cargo ship", "General Cargo Ship", "general cargo"]
+
+  vehicle_carrier:
+    display_name: "Vehicle carrier"
+    typical_service_speed_kn: 18.0
+    aux_load_share: 0.09
+    in_mrv_scope: true
+    aliases: ["Vehicle carrier", "Vehicle Carrier", "PCTC", "car carrier"]
+
+  roro:
+    display_name: "Ro-ro ship"
+    typical_service_speed_kn: 18.0
+    aux_load_share: 0.12
+    in_mrv_scope: true
+    aliases: ["Ro-ro ship", "Ro-Ro ship", "RoRo", "roro"]
+
+  ropax:
+    display_name: "Ro-pax ship"
+    typical_service_speed_kn: 20.0
+    aux_load_share: 0.22
+    in_mrv_scope: true
+    aliases: ["Ro-pax ship", "Ro-Pax ship", "ropax", "RoPax"]
+
+  passenger_ship:
+    display_name: "Passenger ship"
+    typical_service_speed_kn: 18.0
+    aux_load_share: 0.25
+    in_mrv_scope: true
+    aliases: ["Passenger ship", "Passenger Ship"]
+
+  cruise_ship:
+    display_name: "Cruise passenger ship"
+    # Split out by EMSA from 2023 onward. Kept as its own class rather than folded
+    # into passenger_ship: hotel load dominates and differs materially.
+    typical_service_speed_kn: 20.0
+    aux_load_share: 0.35
+    in_mrv_scope: true
+    aliases:
+      - "Passenger ship (Cruise Passenger ship)"
+      - "Cruise Passenger ship"
+      - "cruise ship"
+
+  gas_carrier:
+    display_name: "Gas carrier"
+    typical_service_speed_kn: 16.0
+    aux_load_share: 0.12
+    in_mrv_scope: true
+    aliases: ["Gas carrier", "Gas Carrier", "LPG carrier"]
+
+  lng_carrier:
+    display_name: "LNG carrier"
+    typical_service_speed_kn: 19.0
+    aux_load_share: 0.14
+    in_mrv_scope: true
+    aliases: ["LNG carrier", "LNG Carrier"]
+
+  refrigerated_cargo:
+    display_name: "Refrigerated cargo carrier"
+    typical_service_speed_kn: 18.0
+    aux_load_share: 0.20
+    in_mrv_scope: true
+    aliases: ["Refrigerated cargo carrier", "Reefer", "reefer"]
+
+  combination_carrier:
+    display_name: "Combination carrier"
+    typical_service_speed_kn: 14.5
+    aux_load_share: 0.08
+    in_mrv_scope: true
+    aliases: ["Combination carrier", "Combination Carrier", "OBO"]
+
+  offshore:
+    display_name: "Offshore vessel"
+    # Split out by EMSA from 2024 onward.
+    typical_service_speed_kn: 12.0
+    aux_load_share: 0.25
+    in_mrv_scope: true
+    aliases: ["Other ship types (Offshore)", "Offshore", "PSV", "AHTS"]
+
+  other:
+    display_name: "Other ship types"
+    typical_service_speed_kn: 13.0
+    aux_load_share: 0.12
+    in_mrv_scope: true
+    aliases: ["Other ship types", "Other", "other", "Unknown"]
+
+  # ---- classes NOT present in EU MRV -------------------------------------
+  # Harbour tugs are roughly 200-500 GT, far below the 5000 GT MRV threshold, so
+  # no tug appears anywhere in the training data. They are reached through the
+  # cold-start physics path (P-05) and every tug figure is labelled
+  # physics-derived, never data-derived. These are the GTTP / Mormugao classes.
+
+  harbour_tug:
+    display_name: "Harbour tug"
+    typical_service_speed_kn: 11.0
+    # A tug spends most of its duty cycle pushing at near-zero speed, where
+    # bollard-pull thrust rather than free-running resistance sets the power.
+    # The speed-cubed term therefore describes only the transit phase, and the
+    # duty-cycle model in the tug module handles the rest.
+    aux_load_share: 0.15
+    in_mrv_scope: false
+    aliases: ["Harbour tug", "tug", "Tug", "harbour tug"]
+
+  escort_tug:
+    display_name: "Escort / terminal tug"
+    typical_service_speed_kn: 12.0
+    aux_load_share: 0.15
+    in_mrv_scope: false
+    aliases: ["Escort tug", "Terminal tug", "escort tug"]

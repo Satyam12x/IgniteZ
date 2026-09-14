@@ -1,0 +1,216 @@
+{
+  "run": {
+    "seed": 0,
+    "stage": "emissions.demo",
+    "inputs": {
+      "gwp_set": "ar6_gwp100"
+    },
+    "package_version": "0.1.0",
+    "git_revision": null,
+    "python_version": "3.10.11",
+    "started_at": "2026-09-14T06:09:21.124211+00:00",
+    "input_digest": "b0d68685de9cf341"
+  },
+  "stack_vs_lifecycle": [
+    {
+      "fuel": "mgo",
+      "pathway": "fossil",
+      "label": "Marine gas oil",
+      "stack_only_t": 166.84881602914388,
+      "lifecycle_t": 201.4834622513661,
+      "stack_change": 0.0,
+      "lifecycle_change": 0.0,
+      "verdict_flips": false
+    },
+    {
+      "fuel": "hfo",
+      "pathway": "fossil",
+      "label": "Heavy fuel oil",
+      "stack_only_t": 172.13930348258702,
+      "lifecycle_t": 204.93833726036482,
+      "stack_change": 0.03170827087271055,
+      "lifecycle_change": 0.017147189006949448,
+      "verdict_flips": false
+    },
+    {
+      "fuel": "lng",
+      "pathway": "fossil",
+      "label": "LNG (fossil)",
+      "stack_only_t": 127.3148148148148,
+      "lifecycle_t": 193.54909037037035,
+      "stack_change": -0.2369450509461427,
+      "lifecycle_change": -0.03937976741285598,
+      "verdict_flips": false
+    },
+    {
+      "fuel": "methanol",
+      "pathway": "fossil",
+      "label": "Methanol (grey)",
+      "stack_only_t": 147.4036850921273,
+      "lifecycle_t": 222.5985115821819,
+      "stack_change": -0.11654341576880034,
+      "lifecycle_change": 0.10479792780448238,
+      "verdict_flips": true
+    },
+    {
+      "fuel": "methanol",
+      "pathway": "e_fuel",
+      "label": "E-methanol",
+      "stack_only_t": 0.0,
+      "lifecycle_t": 19.088159823387976,
+      "stack_change": -1.0,
+      "lifecycle_change": -0.9052619028375936,
+      "verdict_flips": false
+    },
+    {
+      "fuel": "ammonia",
+      "pathway": "grey",
+      "label": "Ammonia (grey)",
+      "stack_only_t": 0.0,
+      "lifecycle_t": 281.0965090242623,
+      "stack_change": -1.0,
+      "lifecycle_change": 0.3951343990385314,
+      "verdict_flips": true
+    },
+    {
+      "fuel": "ammonia",
+      "pathway": "blue",
+      "label": "Ammonia (blue)",
+      "stack_only_t": 0.0,
+      "lifecycle_t": 99.22984235759561,
+      "stack_change": -1.0,
+      "lifecycle_change": -0.5075037859246296,
+      "verdict_flips": false
+    },
+    {
+      "fuel": "ammonia",
+      "pathway": "green",
+      "label": "Ammonia (green)",
+      "stack_only_t": 0.0,
+      "lifecycle_t": 41.363175690928955,
+      "stack_change": -1.0,
+      "lifecycle_change": -0.7947068447765444,
+      "verdict_flips": false
+    },
+    {
+      "fuel": "hydrogen",
+      "pathway": "grey",
+      "label": "Hydrogen (grey)",
+      "stack_only_t": 0.0,
+      "lifecycle_t": 220.0,
+      "stack_change": -1.0,
+      "lifecycle_change": 0.09190103019737217,
+      "verdict_flips": true
+    },
+    {
+      "fuel": "hydrogen",
+      "pathway": "green",
+      "label": "Hydrogen (green)",
+      "stack_only_t": 0.0,
+      "lifecycle_t": 16.0,
+      "stack_change": -1.0,
+      "lifecycle_change": -0.9205890159856457,
+      "verdict_flips": false
+    }
+  ],
+  "methane_slip": {
+    "FuelEU default (Otto MS)": {
+      "slip_pct": 3.1,
+      "total_t": 212.64316444444444,
+      "vs_diesel": 0.05538768327871879
+    },
+    "measured fleet median": {
+      "slip_pct": 1.7159999999999997,
+      "total_t": 193.54909037037035,
+      "vs_diesel": -0.03937976741285598
+    },
+    "best engine (diesel SS)": {
+      "slip_pct": 0.2,
+      "total_t": 172.63390518518517,
+      "vs_diesel": -0.143185732187731
+    }
+  },
+  "tug_transition": {
+    "Diesel (today)": {
+      "total_t": 2417.801547016393,
+      "vs_diesel": 0.0,
+      "range_ok": "3 m3",
+      "bunkerable": "yes",
+      "nox_kg": 35597.18969555035,
+      "sox_kg": 1249.0241998438719,
+      "pm_kg": 187.35362997658078
+    },
+    "LNG": {
+      "total_t": 2322.5890844444443,
+      "vs_diesel": -0.03937976741285598,
+      "range_ok": "10 m3",
+      "bunkerable": "not by 2030",
+      "nox_kg": 5555.555555555556,
+      "sox_kg": 0.0,
+      "pm_kg": 11.11111111111111
+    },
+    "E-methanol": {
+      "total_t": 229.05791788065574,
+      "vs_diesel": -0.9052619028375936,
+      "range_ok": "9 m3",
+      "bunkerable": "not by 2030",
+      "nox_kg": 33584.69160792251,
+      "sox_kg": 49.96096799375488,
+      "pm_kg": 71.81575323926423
+    },
+    "Green ammonia": {
+      "total_t": 496.3581082911475,
+      "vs_diesel": -0.7947068447765444,
+      "range_ok": "12 m3",
+      "bunkerable": "not by 2030",
+      "nox_kg": 18491.803278688523,
+      "sox_kg": 87.43169398907105,
+      "pm_kg": 39.78142076502732
+    },
+    "Green hydrogen": {
+      "total_t": 192.0,
+      "vs_diesel": -0.9205890159856457,
+      "range_ok": "42 m3",
+      "bunkerable": "not by 2030",
+      "nox_kg": 0.0,
+      "sox_kg": 0.0,
+      "pm_kg": 0.0
+    },
+    "Electric (shore)": {
+      "total_t": 2910.191490600081,
+      "vs_diesel": 0.20365192676433885,
+      "range_ok": "n/a",
+      "bunkerable": "yes",
+      "nox_kg": 0.0,
+      "sox_kg": 0.0,
+      "pm_kg": 0.0
+    },
+    "_crossover_year": 2035
+  },
+  "harit_sagar": {
+    "2026": {
+      "clean_share": 0.1,
+      "intensity": 0.021989271841028196,
+      "required": 0.021069413481142853,
+      "on_track": false
+    },
+    "2030": {
+      "clean_share": 0.35,
+      "intensity": 0.016517412768188848,
+      "required": 0.01692461082911475,
+      "on_track": true
+    },
+    "2035": {
+      "clean_share": 0.5,
+      "intensity": 0.013234297324485243,
+      "required": 0.014080138420860172,
+      "on_track": true
+    },
+    "2047": {
+      "clean_share": 0.85,
+      "intensity": 0.005573694622510164,
+      "required": 0.00725340464104918,
+      "on_track": true
+    }
+  }
+}

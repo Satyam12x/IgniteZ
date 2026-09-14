@@ -1,0 +1,210 @@
+<title>Green Fleet Planner User Guide</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+<style>
+  :root { color-scheme: light; --ground: #f4f6f8; --surface: #fff; --surface-2: #eef2f4; --ink: #0f1c26; --ink-2: #4a5866; --muted: #7d8791; --line: #e3e8ec; --accent: #1f6f8b; --accent-soft: #e3f0f5; --good: #168f65; --good-soft: #e2f3ec; --warn: #b7791f; --warn-soft: #fbf1dc; --signal: #d9482b; --signal-soft: #fbe9e4; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ground); color: var(--ink); font-family: Poppins, "Segoe UI", system-ui, sans-serif; font-size: 15px; line-height: 1.6; padding-block: 0 64px; padding-inline: 16px; }
+  h1, h2, h3, h4 { margin: 0; line-height: 1.2; }
+  h1 { font-size: 34px; font-weight: 700; }
+  h2 { font-size: 24px; font-weight: 600; }
+  h3 { font-size: 17px; font-weight: 600; margin-top: 6px; }
+  h4 { font-size: 15px; font-weight: 600; }
+  p, li { margin: 0; }
+  ul, ol { margin: 0; padding-left: 22px; }
+  li { margin-bottom: 6px; }
+  code { background: var(--surface-2); padding: 1px 6px; border-radius: 4px; font-family: Consolas, ui-monospace, monospace; font-size: .9em; }
+  pre { background: #0f1f2a; color: #e6edf1; padding: 12px 14px; border-radius: 8px; overflow-x: auto; font-size: 13px; }
+  .eyebrow { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+  .shell { max-width: 940px; margin: 0 auto; }
+  main { display: flex; flex-direction: column; gap: 40px; padding-top: 36px; }
+  .masthead { display: flex; flex-direction: column; gap: 10px; padding-bottom: 22px; border-bottom: 2px solid var(--ink); }
+  .lede { color: var(--ink-2); font-size: 16px; max-width: 72ch; }
+  section { display: flex; flex-direction: column; gap: 16px; }
+  .prose { max-width: 76ch; display: flex; flex-direction: column; gap: 10px; }
+  figure { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+  figure img { width: 100%; max-width: 100%; height: auto; display: block; border-radius: 6px; }
+  figcaption { font-size: 13px; color: var(--ink-2); }
+  .steps { display: flex; flex-direction: column; gap: 10px; counter-reset: step; }
+  .step { display: grid; grid-template-columns: 40px 1fr; gap: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; }
+  .step::before { counter-increment: step; content: counter(step); font-size: 20px; font-weight: 700; color: var(--accent); line-height: 1; }
+  .step p { font-size: 14px; color: var(--ink-2); }
+  .tip { border-left: 4px solid var(--accent); background: var(--accent-soft); padding: 10px 14px; border-radius: 0 6px 6px 0; max-width: 76ch; font-size: 14px; }
+  .warn { border-left: 4px solid var(--warn); background: var(--warn-soft); padding: 10px 14px; border-radius: 0 6px 6px 0; max-width: 76ch; font-size: 14px; }
+  .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-weight: 600; color: var(--ink-2); font-size: 12px; letter-spacing: .04em; text-transform: uppercase; background: var(--surface-2); }
+  tr:last-child td { border-bottom: none; }
+  .foot { color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); padding-top: 16px; }
+</style>
+
+<div class="shell"><main>
+
+<header class="masthead">
+  <span class="eyebrow">Green Fleet Planner · User guide</span>
+  <h1>How to use the Green Fleet Planner</h1>
+  <p class="lede">The planner answers one question: <b>which ships should run, on which fuel, at what speed — and what does each choice cost and emit?</b> This guide walks through every screen, every control and every number, in the order you will meet them.</p>
+</header>
+
+<!-- ================================================================ -->
+<section id="lead">
+  <div><span class="eyebrow">1</span><h2>Starting the planner</h2></div>
+  <div class="prose">
+    <p>From the project folder, once:</p>
+    <pre>uv pip install -e ".[dev,optim,api]"
+python scripts/train_model.py        # trains the fuel model (about 2 minutes)</pre>
+    <p>Then every time:</p>
+    <pre>python -m greenfleet.api             # then open http://127.0.0.1:8000</pre>
+    <p>The browser opens on the <b>Plan</b> page and immediately runs the example fleet, so the first thing you see is a finished result (about 4 seconds). The status pill at the top right reads <b>ready</b> when the planner is idle, <b>searching</b> while it works. The bottom-left of the sidebar shows which model is loaded: <i>Model: 1,00,528 audited ship-years · 25,051 ships</i>.</p>
+  </div>
+  <div class="warn"><b>If a yellow bar says "No trained model loaded"</b>, run <code>python scripts/train_model.py</code> and restart. The planner still works but predictions are physics-only estimates.</div>
+  <div class="prose">
+    <p>The sidebar has four pages: <b>Plan</b> (the main tool), <b>Fuels</b> (compare fuels over their whole life), <b>Calculator</b> (fuel burn for one ship at any speed), <b>Ports</b> (what each Indian port can supply, by year). Nothing needs the internet after the page has loaded.</p>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<section id="plan">
+  <div><span class="eyebrow">2</span><h2>Plan — the main screen</h2></div>
+  <figure><img src="charts/ui_plan_setup.png" alt="Plan page setup card"><figcaption>The setup card. Everything the planner needs is here; the results appear underneath as soon as you press <b>Find plans</b>.</figcaption></figure>
+  <h3>Setting up</h3>
+  <div class="steps">
+    <div class="step"><div><h4>Fleet</h4><p>Pick a starting fleet. <i>Coastal cargo fleet · 12 ships · 2047</i> is the demonstration case (clean fuels available at the ports). <i>2030</i> is the same fleet when only fossil fuels can be bought. <i>Mormugao harbour tugs</i> is the Green Tug Transition case. <i>Two ships · one route</i> is the simplest possible problem. Choosing a fleet also sets the year and the fuels; you can change them afterwards.</p></div></div>
+    <div class="step"><div><h4>Year</h4><p>Which year the plan is for. This decides which fuels the ports can actually supply (see <b>Ports</b>) and how clean India's electricity is. The planner will never assign a fuel that cannot be bought at every port on a route in that year.</p></div></div>
+    <div class="step"><div><h4>Fuels you can buy</h4><p>Tap a fuel to include or exclude it. A ticked chip is included. Six fuels: heavy fuel oil, diesel, LNG, methanol, ammonia, hydrogen. Include only what your ships could really run on and your ports could really supply.</p></div></div>
+    <div class="step"><div><h4>Fleet line</h4><p>A one-line summary of the fleet as it stands: number of ships, routes and ports, cargo to move each year. It says <i>edited</i> if you have changed ships or routes.</p></div></div>
+    <div class="step"><div><h4>Carbon tax, ₹ per tonne CO₂</h4><p>A charge on every tonne of CO₂. Leave 0 if none. A tax makes dirty fuels cost more, so cleaner plans become the cheaper ones.</p></div></div>
+    <div class="step"><div><h4>CO₂ limit, tonnes per year</h4><p>Optional ceiling. Any plan above it is rejected. Leave blank for no limit.</p></div></div>
+    <div class="step"><div><h4>Edit ships &amp; routes</h4><p>Opens a table where every cell is editable and rows can be added or removed. Column meanings are in the next section.</p></div></div>
+    <div class="step"><div><h4>How each fuel is made</h4><p>For fuels that can be produced in more than one way, choose the way. This matters enormously: ammonia made from natural gas ("grey") is <b>worse than diesel</b> over its whole life; made with renewable electricity ("green") it is far cleaner. Same for hydrogen. For methanol, choose <i>e-fuel</i> for the renewable version.</p></div></div>
+    <div class="step"><div><h4>Population · Generations · Seed</h4><p>How hard the search works. Population × Generations = number of complete plans evaluated (30 × 200 = 6,000, the same budget as the published benchmarks; a run takes 3–5 seconds). Raise Generations for a bigger fleet. Seed is the random starting point: the same seed always gives the same answer, a different seed explores differently.</p></div></div>
+    <div class="step"><div><h4>Also run for comparison</h4><p>Runs standard methods on the same problem with the same budget so you can see how our search compares: <i>NSGA-II</i> (the standard genetic algorithm), <i>Greedy</i> (what a planner does by hand), <i>Random</i>. They add a second or two.</p></div></div>
+    <div class="step"><div><h4>Find plans</h4><p>Starts the search. A progress bar shows plans checked and plans kept. The button is disabled while searching.</p></div></div>
+  </div>
+
+  <h3>Editing ships and routes</h3>
+  <div class="table-wrap"><table>
+    <tr><th>Column</th><th>Meaning</th></tr>
+    <tr><td>Name</td><td>Any label. Appears in the results.</td></tr>
+    <tr><td>Type</td><td>Ship class (bulk carrier, general cargo, container, tanker, harbour tug…). Sets the typical speed and hotel load.</td></tr>
+    <tr><td>Capacity t</td><td>Cargo the ship can carry per trip, tonnes.</td></tr>
+    <tr><td>EEDI/EIV</td><td>The energy-efficiency figure from the ship's certificate, gCO₂ per tonne-mile. Leave blank if unknown; the planner then uses a typical value and marks the ship <i>estimate</i>.</td></tr>
+    <tr><td>Min kn · Max kn</td><td>Slowest and fastest speed the engine allows. The planner chooses a speed between them.</td></tr>
+    <tr><td>Tank m³</td><td>Fuel tank volume. Decides whether a fuel has the range for the route (hydrogen needs a much bigger tank than diesel).</td></tr>
+    <tr><td>Cost ₹/yr</td><td>Yearly running cost if the ship is used: crew, maintenance, charter. Fuel is added on top by the planner.</td></tr>
+    <tr><td>Hours/yr</td><td>Hours the ship can be at sea per year after maintenance and port time.</td></tr>
+    <tr><td>Route: From · To</td><td>Ports at each end. Only the eight major ports in the Ports page are available.</td></tr>
+    <tr><td>Distance nmi</td><td>One-way distance in nautical miles (1 nmi = 1.852 km).</td></tr>
+    <tr><td>Cargo t/yr</td><td>Tonnes that must be moved on this route each year. Every plan shown delivers all of it.</td></tr>
+    <tr><td>Max hours</td><td>Optional deadline per one-way trip. Leave blank for none.</td></tr>
+  </table></div>
+  <div class="tip">If the cargo is more than the fleet could move at full speed on every route, the planner refuses immediately and tells you the shortfall. Add ships, raise capacity, or lower the cargo figure.</div>
+
+  <h3>Reading the results</h3>
+  <figure><img src="charts/ui_plan_cards.png" alt="Three plan cards"><figcaption><b>Your options</b> — three cards. Every plan shown delivers all the cargo; the difference is only cost and emissions.</figcaption></figure>
+  <div class="prose">
+    <ul>
+      <li><b>Lowest cost</b> — the cheapest plan that delivers everything. Usually all fossil fuel.</li>
+      <li><b>Balanced</b> — the plan closest to "good on both" (selected by default).</li>
+      <li><b>Lowest emissions</b> — the cleanest plan that delivers everything.</li>
+    </ul>
+    <p>On each card: <b>₹ per year</b> (fuel + running costs + any carbon tax), <b>tonnes of CO₂ per year</b> over the whole life of the fuel, <b>% vs diesel</b> (the same ships on the same routes burning diesel — green is less, red is more), <b>ships used</b>, the <b>fuel mix</b> as coloured chips, and whether the plan <b>meets or misses the Harit Sagar target</b> for that year (India's port target: 30% less CO₂ per tonne of cargo by 2030, 70% by 2047).</p>
+    <p>Click any card to select it.</p>
+  </div>
+  <figure><img src="charts/ui_plan_detail.png" alt="Selected plan detail"><figcaption>The selected plan: the chart of all plans on the left, the assignments on the right.</figcaption></figure>
+  <div class="prose">
+    <p><b>Chart.</b> Every dot is one complete plan. Further left is cheaper, lower down is cleaner. Dot colour is the main fuel in the plan. The selected plan has a dark ring. Click any dot to select that plan — there are usually more plans than the three cards. Hollow diamonds are the plans the comparison methods found (NSGA-II, greedy), so you can see our search finds plans they miss.</p>
+    <p><b>Assignments.</b> One row per ship that sails: route, fuel chip, speed in knots. The last line lists the ships kept in reserve. Hover a fuel chip to see how that fuel is made.</p>
+    <p><b>Download</b> saves the selected plan as a file (JSON) with the settings it was made with.</p>
+  </div>
+  <figure><img src="charts/ui_plan_tech.png" alt="How the search performed"><figcaption><b>How the search performed</b> — the evidence behind the plans.</figcaption></figure>
+  <div class="table-wrap"><table>
+    <tr><th>Panel</th><th>What it tells you</th></tr>
+    <tr><td>Evaluations</td><td>How many complete plans were scored, and how long it took.</td></tr>
+    <tr><td>Search space</td><td>How many combinations exist in total (ships × routes × fuels), and the number of Q-bits — the quantum-inspired decision variables — used to search it.</td></tr>
+    <tr><td>Hypervolume vs NSGA-II</td><td>Hypervolume measures how much of the cost–emissions space a set of plans covers; bigger is better. Above 1× means our search found a better set than the standard method on the same budget. On 12 ships this is roughly a tie (≈1.0–1.1×); the advantage grows with fleet size.</td></tr>
+    <tr><td>Repairs</td><td>Plans the search generated that broke a rule and were repaired rather than thrown away.</td></tr>
+    <tr><td>Search progress</td><td>Top: number of plans on the front per generation — it should climb. Bottom: Q-bit diversity from 1 (all options open) towards 0 (decided) — it should fall smoothly, not collapse.</td></tr>
+    <tr><td>Hypervolume vs baselines</td><td>The same score for each method side by side.</td></tr>
+    <tr><td>Provenance</td><td>Which model produced the fuel figures, the problem size, the fuel pathways and prices used, and a link that reopens exactly this result.</td></tr>
+  </table></div>
+</section>
+
+<!-- ================================================================ -->
+<section id="fuels">
+  <div><span class="eyebrow">3</span><h2>Fuels — compare fuels over their whole life</h2></div>
+  <figure><img src="charts/ui_fuels_chart.png" alt="Fuels chart"><figcaption>Yearly CO₂ for the same amount of engine work, fuel by fuel. The dotted line is diesel.</figcaption></figure>
+  <div class="prose">
+    <p><b>Energy demand</b> — how much work the engines do in a year: one harbour tug, one coastal ship, or exactly 1 TJ for a per-unit comparison. Only the scale changes; the percentages do not.</p>
+    <p><b>Year</b> — matters only for electricity: India's grid gets cleaner each year, so electric options improve.</p>
+    <p><b>Show what a funnel-only tool reports</b> — adds a black tick at the figure a tool would give if it counted only what leaves the funnel. For ammonia, hydrogen and electricity that tick sits at zero; the bar shows the truth.</p>
+    <p><b>Colours:</b> green bars are cleaner than diesel, red are dirtier, <b>amber means "looks clean at the funnel but is dirtier over the whole life"</b> — those are the fuels a naive comparison gets wrong.</p>
+  </div>
+  <figure><img src="charts/ui_fuels_facts.png" alt="Fuel facts"><figcaption>Three facts that change decisions: which fuels flip, LNG with <i>measured</i> methane leakage, and the electric-tug crossover.</figcaption></figure>
+  <figure><img src="charts/ui_fuels_more.png" alt="Electric chart and breakdown table"><figcaption>Electric tug vs diesel by year (the arrow marks the crossover year), and the full lifecycle breakdown.</figcaption></figure>
+  <div class="table-wrap"><table>
+    <tr><th>Column</th><th>Meaning</th></tr>
+    <tr><td>Total t</td><td>Tonnes of CO₂-equivalent per year over the whole life of the fuel.</td></tr>
+    <tr><td>Upstream</td><td>Making and transporting the fuel before it reaches the ship.</td></tr>
+    <tr><td>CO₂</td><td>From burning it on board.</td></tr>
+    <tr><td>CH₄</td><td>Methane that escapes unburnt (LNG), converted to CO₂-equivalent.</td></tr>
+    <tr><td>N₂O</td><td>Nitrous oxide formed in the engine (mostly ammonia), converted to CO₂-equivalent.</td></tr>
+    <tr><td>Pilot</td><td>The small amount of diesel a methanol or ammonia engine needs to ignite.</td></tr>
+    <tr><td>vs diesel · Funnel-only</td><td>Change against diesel over the whole life, and what a funnel-only count would claim.</td></tr>
+    <tr><td>Confidence</td><td>How well established the underlying factor is. <i>Provisional</i> figures should be confirmed before publication.</td></tr>
+  </table></div>
+</section>
+
+<!-- ================================================================ -->
+<section id="calc">
+  <div><span class="eyebrow">4</span><h2>Calculator — fuel for one ship at any speed</h2></div>
+  <figure><img src="charts/ui_calc.png" alt="Calculator"><figcaption>Choose a ship type, enter its efficiency certificate if you have it, pick a fuel, and drag the speed slider.</figcaption></figure>
+  <div class="prose">
+    <p>The big number is <b>tonnes of fuel per 1,000 nautical miles</b> at the chosen speed, with the likely range. Below it: engine power needed, how much slowing down by two knots saves per mile, the most fuel-efficient speed if there were no schedule, and the typical service speed for that ship type.</p>
+    <p>The chart is the same figure at every speed: the line is the estimate, the shaded band the likely range, the red dot your chosen speed. Slower is cheaper per mile until very slow speeds, where the ship's hotel load (lights, cooling, pumps) starts to dominate.</p>
+    <p>The badge says what the figure is based on. <b>Based on certificate</b> means the ship's own efficiency figure was used and the model is typically within about 20% on ships it has never seen. <b>Estimate</b> means no certificate was given — the planner uses a typical value for the type and shows a much wider range; plan with the upper end. Harbour tugs are always estimates: they are below the size the data covers.</p>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<section id="ports">
+  <div><span class="eyebrow">5</span><h2>Ports — what each port can supply</h2></div>
+  <figure><img src="charts/ui_ports.png" alt="Ports"><figcaption>Eight major Indian ports; shore power and each fuel, for the chosen year.</figcaption></figure>
+  <div class="prose">
+    <p>✓ available · ◐ limited (small volumes, by arrangement) · ○ planned, <b>not usable yet</b> · ✗ none. The Plan page uses this table: a fuel is allowed on a route only if every port on the route shows ✓ or ◐ in that year. "Planned" is deliberately not enough — a fleet plan built on an uncommissioned facility strands ships.</p>
+    <p>Chips mark the <i>pilot site</i> (Mormugao), ports in the <i>green tugs</i> programme, and <i>H₂ hub</i> ports designated for green hydrogen.</p>
+    <p>The grid chart shows the carbon intensity of India's electricity used for shore power and battery-electric ships; values after 2023 are projections.</p>
+  </div>
+  <div class="warn">The years in this table are placeholders with the correct structure. Before any published result, confirm them with each port authority — this is the first task of the pilot.</div>
+</section>
+
+<!-- ================================================================ -->
+<section id="problems">
+  <div><span class="eyebrow">6</span><h2>Messages you may see, and what to do</h2></div>
+  <div class="table-wrap"><table>
+    <tr><th>Message</th><th>Meaning</th><th>What to do</th></tr>
+    <tr><td>Select at least one fuel.</td><td>No fuel chip is ticked.</td><td>Tick at least one.</td></tr>
+    <tr><td>This fleet cannot move that much cargo…</td><td>Even at full speed on every route the ships cannot deliver the cargo figure.</td><td>Add ships, raise capacity or hours, or lower the cargo.</td></tr>
+    <tr><td>No plan delivers all the cargo with these fuels in this year…</td><td>A ticked fuel cannot be bought at one of the ports on a route in that year, or the CO₂ limit is too tight.</td><td>Check the Ports page for the year; tick diesel as well; raise or remove the CO₂ limit.</td></tr>
+    <tr><td>Yellow bar: Planning service unreachable</td><td>The server is not running.</td><td>Start it with <code>python -m greenfleet.api</code> and reload.</td></tr>
+    <tr><td>Yellow bar: No trained model loaded</td><td>The fuel model has not been trained on this machine.</td><td>Run <code>python scripts/train_model.py</code>, restart the server.</td></tr>
+    <tr><td>A ship marked <i>estimate</i></td><td>No efficiency certificate was given for it.</td><td>Enter the EEDI/EIV in Edit ships &amp; routes if you have it.</td></tr>
+  </table></div>
+</section>
+
+<!-- ================================================================ -->
+<section id="demo">
+  <div><span class="eyebrow">7</span><h2>A five-minute walkthrough</h2></div>
+  <div class="steps">
+    <div class="step"><div><h4>Open on the finished result</h4><p>Read the three cards left to right: cheapest (all HFO, misses the target) → balanced → cleanest (all e-methanol, 91% less than diesel, meets Harit Sagar 2047). Same ships, same cargo.</p></div></div>
+    <div class="step"><div><h4>Click Lowest emissions</h4><p>Show the assignments: which ship, which route, which fuel, what speed, who stays in reserve. Click a middle dot on the chart to show there are more plans than three.</p></div></div>
+    <div class="step"><div><h4>Switch the fleet to 2030 and press Find plans</h4><p>Every plan is fossil, every card misses the target. Point at Ports: in 2030 methanol is only <i>planned</i> at Mormugao and Cochin, so the planner refuses to use it.</p></div></div>
+    <div class="step"><div><h4>Untick every fuel except Hydrogen, press Find plans</h4><p>"No plan delivers all the cargo" — hydrogen is not bunkerable on these routes in that year. The refusal is the feature.</p></div></div>
+    <div class="step"><div><h4>Fuels page</h4><p>Tick "Show what a funnel-only tool reports": the black ticks at zero for ammonia and hydrogen against the amber bars. Then the three fact cards.</p></div></div>
+    <div class="step"><div><h4>Calculator</h4><p>Drag the speed from 14 to 12 knots: −24% per mile. Switch the type to Harbour tug: the badge turns to <i>Estimate</i> and the band widens — the tool says when it is guessing.</p></div></div>
+    <div class="step"><div><h4>Back to Plan, scroll to How the search performed</h4><p>6,000 plans evaluated in a few seconds out of 2.3×10¹³ combinations; hypervolume about level with NSGA-II on 12 ships; the diversity curve falling smoothly.</p></div></div>
+  </div>
+  <p class="foot">Companion documents: <code>docs/STUDY_GUIDE.pdf</code> (what the project is and why, in plain language) · <code>docs/REPORT_FOR_PPT.pdf</code> (results for the deck) · <code>docs/DEMO_GUIDE.md</code> (what to say at each screen) · <code>docs/FINDINGS_PHASE4.md</code> (how the platform is built).</p>
+</section>
+
+</main></div>
