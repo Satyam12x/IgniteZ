@@ -56,7 +56,7 @@ Create a Web Service from the repository with:
 |---|---|
 | Build command | `pip install -e ".[api,optim]"` |
 | Start command | `uvicorn greenfleet.api.app:app --host 0.0.0.0 --port $PORT` |
-| Environment | `PYTHON_VERSION=3.10.11` |
+| Python version | read from `.python-version` (3.10.11); no environment variables needed |
 | Health check path | `/api/health` |
 
 Free Render services sleep after about 15 minutes without traffic. Q Fleet keeps itself
