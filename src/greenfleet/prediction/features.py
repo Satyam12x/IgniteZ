@@ -3,7 +3,7 @@
 Why this module is defensive
 ----------------------------
 MRV publishes intensity *ratios*, and most reconstructed quantities share a
-component with the target (see docs/FINDINGS_PHASE1.md §2). The target is energy
+component with the target (see prediction/model.py). The target is energy
 per nautical mile, which is ``LHV x fuel_per_distance``; and
 
     distance_nmi    = total_fuel * 1000 / fuel_per_distance
@@ -245,7 +245,7 @@ def build_features(
             f"{bad} share a component with the target ({TARGET} is "
             "LHV x fuel_per_distance, and these are all derived from "
             "fuel_per_distance). Using them inflates the score without improving "
-            "the model. See docs/FINDINGS_PHASE1.md section 2."
+            "the model. Leave them out of extra_features."
         )
     mapping = classes or load_vessel_classes()
 

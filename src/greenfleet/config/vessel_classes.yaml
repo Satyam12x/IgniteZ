@@ -9,7 +9,7 @@
 #    already in use. Unknown labels map to `other` with a warning, never silently.
 #
 # 2. Supply the reference operating point the physics core needs. MRV cannot
-#    identify the speed-fuel relationship (see docs/FINDINGS_PHASE1.md §2), so the
+#    identify the speed-fuel relationship (see prediction/model.py), so the
 #    speed response is imposed from naval architecture and anchored at a per-class
 #    typical service speed. These are published typical values, not fitted, and are
 #    tagged provisional accordingly.

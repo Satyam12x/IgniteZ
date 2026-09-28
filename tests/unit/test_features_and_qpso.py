@@ -102,9 +102,9 @@ class TestContaminationGuardP01:
         with pytest.raises(ContaminatedFeatureError, match="share a component"):
             build_features(frame, extra_features=(column,))
 
-    def test_error_points_to_the_findings_document(self, raw_panel):
+    def test_error_says_how_to_fix_it(self, raw_panel):
         frame = raw_panel.assign(mean_speed_kn=1.0)
-        with pytest.raises(ContaminatedFeatureError, match="FINDINGS_PHASE1"):
+        with pytest.raises(ContaminatedFeatureError, match="Leave them out of extra_features"):
             build_features(frame, extra_features=("mean_speed_kn",))
 
     def test_the_target_itself_is_on_the_contaminated_list(self):

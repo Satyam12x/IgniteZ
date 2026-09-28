@@ -22,6 +22,7 @@ from greenfleet.optimize.baselines import (
     BaselineResult,
     greedy_fleet,
     nsga2_fleet,
+    qbho_fleet,
     random_search_fleet,
 )
 from greenfleet.optimize.encoding import FleetEncoding
@@ -502,6 +503,8 @@ def run_optimisation(state: AppState, job: Job) -> dict[str, Any]:
             baselines.append(greedy_fleet(problem, seed=request.seed))
         elif name == "nsga2":
             baselines.append(nsga2_fleet(problem, n_evaluations=budget, seed=request.seed))
+        elif name == "qbho":
+            baselines.append(qbho_fleet(problem, n_evaluations=budget, seed=request.seed))
         elif name == "random":
             baselines.append(random_search_fleet(problem, n_evaluations=budget, seed=request.seed))
 

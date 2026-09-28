@@ -154,7 +154,7 @@ class OptimiseRequest(_Strict):
     n_generations: int = Field(default=60, ge=1, le=2000)
     seed: int = Field(default=1000, ge=0)
     time_limit_s: float | None = Field(default=None, gt=0, le=600)
-    compare_with: list[Literal["nsga2", "greedy", "random"]] = Field(default_factory=list)
+    compare_with: list[Literal["nsga2", "qbho", "greedy", "random"]] = Field(default_factory=list)
 
 
 class JobProgress(BaseModel):

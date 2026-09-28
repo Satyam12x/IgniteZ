@@ -51,7 +51,7 @@ def create_app(state: AppState | None = None) -> FastAPI:
         yield
 
     app = FastAPI(
-        title="Green Fleet Optimizer",
+        title="Q Fleet",
         version=__version__,
         description="Quantum-inspired fuel prediction and green fleet optimisation (SIH26138).",
         lifespan=lifespan,

@@ -54,7 +54,7 @@ addopts = "-q --strict-markers"
 markers = [
     "slow: long-running (benchmarks, 30-seed runs)",
     "network: requires internet access",
-    "edgecase: maps to an ID in docs/TEST_AND_EDGE_CASES.md",
+    "edgecase: covers a named physical or data edge case",
     "integration: runs against real downloaded data",
 ]
 
@@ -67,5 +67,3 @@ select = ["E", "F", "I", "UP", "B", "SIM"]
 
 [tool.ruff.lint.per-file-ignores]
 "scripts/*" = ["UP031"]
-"scripts/make_charts.py" = ["UP031", "E501"]
-"scripts/make_report_pdf.py" = ["E501"]  # embedded print CSS  # printf-style formatting is clearer for fixed-width report tables

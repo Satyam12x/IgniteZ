@@ -3,156 +3,214 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Green Fleet Planner</title>
+<title>Q Fleet</title>
+<meta name="description" content="Q Fleet: fuel prediction and fleet planning for cleaner Indian shipping.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="/static/tailwind.css">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400&display=swap">
+<link rel="stylesheet" href="/static/styles.css">
 </head>
-<body class="bg-ground font-sans text-[14px] leading-normal text-ink">
-<svg hidden xmlns="http://www.w3.org/2000/svg">
-  <symbol id="i-ship" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17c1.5 1 3 1 4.5 0s3-1 4.5 0 3 1 4.5 0 3-1 4.5 0"/><path d="M4 14l1.5-4h13L20 14"/><path d="M8 10V6h8v4"/><path d="M12 6V3"/></symbol>
-  <symbol id="i-drop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></symbol>
-  <symbol id="i-gauge" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16a8 8 0 1 1 16 0"/><path d="M12 16l4-5"/><circle cx="12" cy="16" r="1.5"/></symbol>
-  <symbol id="i-anchor" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2.5"/><path d="M12 7.5V21"/><path d="M5 12H3a9 9 0 0 0 18 0h-2"/><path d="M8 10h8"/></symbol>
-</svg>
+<body>
 
-<div class="grid min-h-screen grid-cols-1 lg:grid-cols-[200px_1fr]">
-  <aside class="sticky top-0 flex h-auto flex-col gap-5 bg-gradient-to-b from-[#13283a] to-side p-4 text-[#e6edf1] lg:h-screen">
-    <div class="flex items-center gap-2.5 border-b border-white/10 px-1 pb-4">
-      <span class="grid h-9 w-9 shrink-0 place-items-center rounded-[10px] bg-gradient-to-br from-accent-2 to-accent"><svg class="h-[22px] w-[22px] text-white"><use href="#i-ship"/></svg></span>
-      <div><div class="font-display text-[15px] font-bold leading-tight">Green Fleet</div><div class="text-[11px] uppercase tracking-[0.06em] text-[#8aa0ac]">Planner</div></div>
+<nav class="nav">
+  <div class="nav-in">
+    <a class="brand" href="#/home"><span class="brand-mark">Q</span><span><div class="brand-name">Q Fleet</div><div class="brand-sub">Cleaner fleets, planned</div></span></a>
+    <div class="links">
+      <button class="link active" data-view="home">Home</button>
+      <button class="link" data-view="plan">Plan my fleet</button>
+      <button class="link" data-view="fuels">Compare fuels</button>
+      <button class="link" data-view="calc">Fuel calculator</button>
+      <button class="link" data-view="ports">Ports</button>
+      <button class="link" data-view="tech">How it works</button>
     </div>
-    <nav class="flex flex-col gap-0.5">
-      <button class="nav-item active" data-view="plan"><svg><use href="#i-ship"/></svg><span>Plan</span></button>
-      <button class="nav-item" data-view="fuels"><svg><use href="#i-drop"/></svg><span>Fuels</span></button>
-      <button class="nav-item" data-view="calc"><svg><use href="#i-gauge"/></svg><span>Calculator</span></button>
-      <button class="nav-item" data-view="ports"><svg><use href="#i-anchor"/></svg><span>Ports</span></button>
-    </nav>
-    <div class="mt-auto flex flex-col gap-2.5 border-t border-white/10 pt-3.5">
-      <div class="text-[11px] leading-snug text-[#8aa0ac]" id="model-note"></div>
+    <div class="status" id="status-text">connecting</div>
+  </div>
+</nav>
+<div class="banner" id="banner" hidden></div>
+
+<!-- HOME -->
+<main class="page view" id="view-home">
+  <section class="hero">
+    <div class="hero-main">
+      <div class="eyebrow">Fleet planning for Indian ports</div>
+      <h1>The right fuel for every ship, <em>at a cost you can see</em></h1>
+      <p>Q Fleet predicts how much fuel each ship burns, counts the real lifecycle CO₂ of every fuel, and finds the plans where cost and emissions are best balanced, checked against India's Harit Sagar targets.</p>
+      <div class="btns"><button class="btn" data-go="plan">Plan my fleet</button><button class="btn btn-ghost" data-go="fuels">Compare fuels</button></div>
     </div>
-  </aside>
+    <div class="card hero-plan" id="home-plan">
+      <div class="eyebrow">Recommended plan</div>
+      <div class="sub" id="home-progress">Finding the best plans for the coastal fleet…</div>
+      <div class="track"><div class="fill" id="home-fill"></div></div>
+      <div class="skel" style="height:40px;width:70%"></div><div class="skel" style="height:14px;width:45%"></div><div class="skel" style="height:24px;width:60%"></div>
+    </div>
+  </section>
 
-  <div class="flex min-w-0 flex-col">
-    <header class="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-line bg-white px-5 py-3.5">
-      <h1 class="font-display text-[21px] font-bold" id="page-title">Plan</h1>
-      <div class="inline-flex items-center gap-2 rounded-full bg-surface2 px-3 py-1.5 text-xs text-ink2" id="status-pill"><span class="dot h-[7px] w-[7px] rounded-full bg-muted"></span><span id="status-text">connecting</span></div>
-    </header>
-    <div class="bg-warn-soft px-5 py-2 text-[13px] text-warn-ink" id="banner" hidden></div>
+  <section class="strip" id="home-kpis"></section>
 
-    <!-- PLAN -->
-    <section class="view flex w-full flex-col gap-5 px-5 pb-10 pt-5" id="view-plan">
-      <div class="card gap-4 !p-5">
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-[1.4fr_0.6fr_auto]">
-          <label class="field">Fleet<select id="scenario" class="input !py-2.5 !text-[14px]">
-            <option value="coastal_2047">Coastal cargo fleet · 12 ships · 2047</option>
-            <option value="coastal">Coastal cargo fleet · 12 ships · 2030</option>
-            <option value="gttp_tug">Mormugao harbour tugs · 10 tugs · 2030</option>
-            <option value="tiny">Two ships · one route</option>
-          </select></label>
-          <label class="field">Year<select id="year" class="input !py-2.5 !text-[14px]"><option>2024</option><option>2030</option><option>2035</option><option>2040</option><option>2047</option></select></label>
-          <div class="flex items-end"><button class="btn-primary !px-6 !py-2.5 !text-[14px]" id="run">Find plans</button></div>
-        </div>
-        <div class="field">Fuels you can buy<div class="flex flex-wrap gap-2" id="fuel-picks"></div></div>
-        <div class="flex flex-wrap items-center gap-x-5 gap-y-1 text-[12.5px] text-ink2" id="fleet-summary"></div>
-        <div class="flex flex-col gap-1.5" id="progress" hidden><div class="track h-1.5"><div class="progress-fill h-full w-0 bg-accent" id="fill"></div></div><div class="text-xs text-ink2" id="progress-text"></div></div>
-        <div class="err" id="plan-error" hidden></div>
-        <div class="grid grid-cols-1 gap-4 border-t border-line pt-4 md:grid-cols-3">
-          <label class="field">Carbon tax, ₹ per tonne CO₂<input id="carbon" type="number" min="0" step="100" value="0" class="input"></label>
-          <label class="field">CO₂ limit, tonnes per year<input id="cap" type="number" min="0" step="1000" placeholder="none" class="input"></label>
-          <div class="field">Ships &amp; routes<button class="btn-ghost-sm" id="edit-fleet">Edit ships &amp; routes</button></div>
-          <div class="field md:col-span-3">How each fuel is made<div class="grid grid-cols-1 gap-2 md:grid-cols-3" id="pathways"></div></div>
-        </div>
-        <div class="grid grid-cols-2 gap-3 border-t border-line pt-4 md:grid-cols-6">
-          <label class="field">Population<input id="ind" type="number" min="2" max="200" value="30" class="input"></label>
-          <label class="field">Generations<input id="gen" type="number" min="1" max="2000" value="200" class="input"></label>
-          <label class="field">Seed<input id="seed" type="number" min="0" value="1000" class="input"></label>
-          <div class="field md:col-span-3">Also run for comparison<div class="flex flex-wrap gap-4 pt-1.5 text-[13px]"><label class="flex items-center gap-1.5"><input type="checkbox" id="cmp-nsga2" checked> NSGA-II</label><label class="flex items-center gap-1.5"><input type="checkbox" id="cmp-greedy" checked> Greedy</label><label class="flex items-center gap-1.5"><input type="checkbox" id="cmp-random"> Random</label></div></div>
-        </div>
+  <section class="stack">
+    <div class="section-head"><h2>Your three best options</h2><span class="sub" id="home-options-sub"></span><button class="btn btn-ghost btn-sm push" data-go="plan">Open the full plan</button></div>
+    <div class="grid g3" id="home-options"></div>
+  </section>
+
+  <section class="grid g2">
+    <div class="card"><div class="section-head"><h2>Fuel reality check</h2><span class="sub" id="home-facts-sub"></span></div><div class="stack" style="gap:16px" id="home-facts"></div></div>
+    <div class="card"><div class="section-head"><h2>India's grid is getting cleaner</h2><span class="sub">tonnes CO₂ per MWh</span></div><div id="home-grid-chart" class="chart" style="height:240px"></div><div class="sub">Cleaner power makes electric harbour tugs better than diesel from <b id="home-cross"></b>.</div></div>
+  </section>
+
+  <section class="stack">
+    <div class="section-head"><h2>What you can do here</h2></div>
+    <div class="grid g4">
+      <button class="explore" data-go="plan"><span class="n">01</span><b>Plan my fleet</b><span>Get the cheapest, cleanest and balanced fuel plan for your ships and routes.</span><i>Open →</i></button>
+      <button class="explore" data-go="fuels"><span class="n">02</span><b>Compare fuels</b><span>See the real lifecycle CO₂ of each fuel, not only what leaves the funnel.</span><i>Open →</i></button>
+      <button class="explore" data-go="calc"><span class="n">03</span><b>Fuel calculator</b><span>How much fuel one ship burns at each speed, and what slowing down saves.</span><i>Open →</i></button>
+      <button class="explore" data-go="ports"><span class="n">04</span><b>Ports</b><span>Which clean fuels and shore power each Indian port offers, year by year.</span><i>Open →</i></button>
+    </div>
+  </section>
+</main>
+
+<!-- PLAN -->
+<main class="page view" id="view-plan" hidden>
+  <div class="page-head"><div><h1>Plan my fleet</h1><p>Pick a fleet and the fuels you can buy. Q Fleet finds every plan where you cannot cut cost without adding CO₂, and highlights three.</p></div></div>
+  <div class="plan-layout">
+    <aside class="card setup">
+      <div class="step"><span class="step-n">1</span>Choose a fleet</div>
+      <label class="field">Fleet<select id="scenario" class="input">
+        <option value="coastal_2047">Coastal cargo fleet, 12 ships, 2047</option>
+        <option value="coastal">Coastal cargo fleet, 12 ships, 2030</option>
+        <option value="gttp_tug">Mormugao harbour tugs, 10 tugs, 2030</option>
+        <option value="tiny">Two ships, one route</option>
+      </select></label>
+      <div class="grid g2" style="gap:10px;align-items:end">
+        <label class="field">Year<select id="year" class="input"><option>2024</option><option>2030</option><option>2035</option><option>2040</option><option>2047</option></select></label>
+        <button class="btn btn-ghost" id="edit-fleet">Edit ships</button>
       </div>
+      <div class="summary" id="fleet-summary"></div>
+      <div class="step" style="margin-top:4px"><span class="step-n">2</span>Fuels you can buy</div>
+      <div class="chips" id="fuel-picks"></div>
+      <div class="step" style="margin-top:4px"><span class="step-n">3</span>Find the best plans</div>
+      <button class="btn btn-block" id="run">Find plans</button>
+      <div class="progress" id="progress" hidden><div class="track"><div class="fill" id="fill"></div></div><div class="sub" id="progress-text"></div></div>
+      <div class="err" id="plan-error" hidden></div>
 
-      <div class="flex flex-col gap-5" id="results" hidden>
-        <div>
-          <div class="mb-2.5 flex items-baseline gap-3"><h2 class="font-display text-[17px] font-semibold">Your options</h2><span class="sub" id="results-sub"></span></div>
-          <div class="grid grid-cols-1 gap-4 md:grid-cols-3" id="plan-cards"></div>
-        </div>
-        <div class="card !p-5">
-          <div class="flex flex-wrap items-baseline gap-3"><h2 class="font-display text-[17px] font-semibold" id="detail-title">Selected plan</h2><span class="sub" id="detail-sub"></span><button class="btn-ghost-sm ml-auto" id="download">Download</button></div>
-          <div class="grid grid-cols-1 gap-5 xl:grid-cols-[1fr_1fr]">
-            <div><div class="mb-1 flex items-center gap-3 text-xs text-ink2"><span>All plans · click to select</span><span class="ml-auto flex gap-3" id="fuel-legend"></span></div><div id="tradeoff-chart" class="h-[320px] w-full"></div></div>
-            <div class="overflow-x-auto"><table class="w-full border-collapse" id="assign-table"><thead><tr><th class="th">Ship</th><th class="th">Route</th><th class="th">Fuel</th><th class="th text-right">Speed</th></tr></thead><tbody></tbody></table></div>
+      <details class="more">
+        <summary>More options</summary>
+        <div class="more-body">
+          <div class="grid g2" style="gap:10px">
+            <label class="field">Carbon tax, ₹/t CO₂<input id="carbon" type="number" min="0" step="100" value="0" class="input"></label>
+            <label class="field">CO₂ limit, t/yr<input id="cap" type="number" min="0" step="1000" placeholder="no limit" class="input"></label>
+          </div>
+          <div class="stack" style="gap:10px"><div class="group-t">How each fuel is made</div><div class="stack" style="gap:10px" id="pathways"></div></div>
+          <div class="stack" style="gap:10px"><div class="group-t">Search settings</div>
+            <div class="grid g3" style="gap:10px">
+              <label class="field">Population<input id="ind" type="number" min="2" max="200" value="30" class="input"></label>
+              <label class="field">Generations<input id="gen" type="number" min="1" max="2000" value="200" class="input"></label>
+              <label class="field">Seed<input id="seed" type="number" min="0" value="1000" class="input"></label>
+            </div>
+            <div class="field">Also run for comparison (adds about 20 s)<div class="checks"><label><input type="checkbox" id="cmp-nsga2"> NSGA-II</label><label><input type="checkbox" id="cmp-qbho"> QBHO</label><label><input type="checkbox" id="cmp-greedy"> Greedy</label><label><input type="checkbox" id="cmp-random"> Random</label></div></div>
           </div>
         </div>
-        <div class="flex flex-col gap-4">
-          <div class="section-title">How the search performed</div>
-          <div class="grid grid-cols-2 gap-3.5 md:grid-cols-4" id="tech-kpis"></div>
-          <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div class="card"><h2 class="h2">Search progress</h2><div id="progress-chart" class="h-[220px] w-full"></div></div>
-            <div class="card" id="methods-card"><h2 class="h2">Hypervolume vs baselines</h2><div id="methods-chart" class="h-[220px] w-full"></div></div>
+      </details>
+    </aside>
+
+    <section class="plan-main">
+      <div id="results" hidden class="stack" style="gap:20px">
+        <div class="stack">
+          <div class="section-head"><h2>Your options</h2><span class="sub" id="results-sub"></span></div>
+          <div class="grid g3" id="plan-cards"></div>
+        </div>
+        <div class="card">
+          <div class="section-head"><h2 id="detail-title">Selected plan</h2><span class="sub" id="detail-sub"></span><button class="btn btn-ghost btn-sm push" id="download">Download plan</button></div>
+          <div class="grid g-plan">
+            <div><div class="legend" style="margin-bottom:4px"><span class="sub">Every plan found. Left is cheaper, lower is cleaner. Click a dot to select it.</span><span class="push" id="fuel-legend"></span></div><div id="tradeoff-chart" class="chart" style="height:340px"></div></div>
+            <div class="table-wrap"><table id="assign-table"><thead><tr><th>Ship</th><th>Route</th><th>Fuel</th><th class="r">Speed</th></tr></thead><tbody></tbody></table></div>
           </div>
-          <div class="card text-xs text-ink2" id="provenance"></div>
         </div>
+        <div class="note">Want the numbers behind the search? See <a href="#/tech">How it works</a>.</div>
       </div>
-      <div class="card items-center py-12 text-center text-ink2" id="plan-empty"><svg class="h-9 w-9 text-muted"><use href="#i-ship"/></svg><p>Choose a fleet and press <b class="font-semibold">Find plans</b>.</p></div>
-    </section>
-
-    <!-- FUELS -->
-    <section class="view flex w-full flex-col gap-5 px-5 pb-10 pt-5" id="view-fuels" hidden>
-      <div class="card !p-5">
-        <div class="flex flex-wrap items-end gap-4">
-          <label class="field min-w-[220px]">Energy demand<select id="fuel-preset" class="input"><option value="12">One harbour tug for a year</option><option value="200">One coastal ship for a year</option><option value="1">1 TJ of engine work</option></select></label>
-          <label class="field w-[120px]">Year<select id="fuel-year" class="input"><option>2024</option><option selected>2030</option><option>2035</option><option>2040</option><option>2047</option></select></label>
-          <label class="mb-2 flex items-center gap-2 text-[13px]"><input type="checkbox" id="funnel-only"> Show what a funnel-only tool reports</label>
-          <span class="mb-2 ml-auto text-xs text-muted" id="fuel-sub"></span>
-        </div>
-        <div id="fuel-chart" class="h-[400px] w-full"></div>
-      </div>
-      <div class="grid grid-cols-1 gap-4 md:grid-cols-3" id="fuel-facts"></div>
-      <div class="card"><h2 class="h2">Electric tug vs diesel, by year</h2><div id="elec-chart" class="h-[220px] w-full"></div></div>
-      <div class="card"><h2 class="h2">Lifecycle breakdown, tonnes CO₂e per year</h2><div class="overflow-x-auto"><table class="w-full border-collapse" id="fuel-table"><thead><tr><th class="th">Option</th><th class="th text-right">Total t</th><th class="th text-right">Upstream</th><th class="th text-right">CO₂</th><th class="th text-right">CH₄</th><th class="th text-right">N₂O</th><th class="th text-right">Pilot</th><th class="th text-right">vs diesel</th><th class="th text-right">Funnel-only</th><th class="th">Confidence</th></tr></thead><tbody></tbody></table></div></div>
-    </section>
-
-    <!-- CALCULATOR -->
-    <section class="view flex w-full flex-col gap-5 px-5 pb-10 pt-5" id="view-calc" hidden>
-      <div class="card !p-5">
-        <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
-          <label class="field">Ship type<select id="calc-class" class="input"></select></label>
-          <label class="field">Efficiency certificate<input id="calc-design" type="number" min="0.5" step="0.1" value="5.2" placeholder="unknown" class="input"></label>
-          <label class="field">Fuel<select id="calc-fuel" class="input"></select></label>
-          <label class="field"><span class="flex items-center gap-1.5">Speed <b class="text-ink" id="calc-speed-label">14.0 kn</b></span><input id="calc-speed" type="range" min="4" max="18" step="0.5" value="14" class="mt-2"></label>
-        </div>
-        <div class="err" id="calc-error" hidden></div>
-      </div>
-      <div class="grid grid-cols-1 gap-4 md:grid-cols-[0.8fr_1.2fr]">
-        <div class="card !p-5" id="calc-answer"></div>
-        <div class="card"><div class="flex items-baseline gap-2"><h2 class="h2">Fuel per 1,000 nautical miles</h2><span class="sub" id="calc-sub"></span></div><div id="calc-chart" class="h-[300px] w-full"></div></div>
-      </div>
-      <div class="card text-xs text-ink2" id="calc-provenance"></div>
-    </section>
-
-    <!-- PORTS -->
-    <section class="view flex w-full flex-col gap-5 px-5 pb-10 pt-5" id="view-ports" hidden>
-      <div class="card !p-5">
-        <div class="flex flex-wrap items-center gap-4">
-          <label class="field w-[120px]">Year<select id="ports-year" class="input"><option>2024</option><option selected>2030</option><option>2040</option><option>2047</option></select></label>
-          <div class="ml-auto flex flex-wrap gap-x-4 gap-y-1 text-[12.5px] text-ink2"><span><b class="ic text-good">✓</b> available</span><span><b class="ic text-accent">◐</b> limited</span><span><b class="ic text-warn">○</b> planned</span><span><b class="ic text-[#c3cad0]">✗</b> none</span></div>
-        </div>
-        <div class="overflow-x-auto"><table class="w-full border-collapse" id="ports-table"><thead></thead><tbody></tbody></table></div>
-        <div class="note" id="ports-note"></div>
-      </div>
-      <div class="card"><h2 class="h2">Grid carbon intensity, tCO₂/MWh</h2><div id="grid-chart" class="h-[220px] w-full"></div></div>
+      <div class="card empty" id="plan-empty"><div class="big">No plan yet</div><p>Choose a fleet on the left and press Find plans.</p></div>
     </section>
   </div>
-</div>
+</main>
+
+<!-- FUELS -->
+<main class="page view" id="view-fuels" hidden>
+  <div class="page-head"><div><h1>Compare fuels</h1><p>Total CO₂ over the whole life of each fuel: making it, shipping it and burning it. The dotted line is diesel today.</p></div></div>
+  <div class="card">
+    <div class="grid g4" style="align-items:end">
+      <label class="field">Energy demand<select id="fuel-preset" class="input"><option value="12">One harbour tug for a year</option><option value="200">One coastal ship for a year</option><option value="1">1 TJ of engine work</option></select></label>
+      <label class="field">Year<select id="fuel-year" class="input"><option>2024</option><option selected>2030</option><option>2035</option><option>2040</option><option>2047</option></select></label>
+      <div class="checks" style="padding-bottom:10px"><label><input type="checkbox" id="funnel-only"> Also show what a funnel-only tool reports</label></div>
+      <span class="sub" style="padding-bottom:10px;text-align:right" id="fuel-sub"></span>
+    </div>
+    <div id="fuel-chart" class="chart" style="height:420px"></div>
+    <div class="legend"><span><i class="swatch" style="background:var(--p-900)"></i>Diesel today</span><span><i class="swatch" style="background:var(--p-500)"></i>Cleaner than diesel</span><span><i class="swatch" style="background:var(--p-200)"></i>Looks clean, is not</span><span><i class="swatch" style="background:#c9d0db"></i>Dirtier than diesel</span></div>
+  </div>
+  <div class="grid g3" id="fuel-facts"></div>
+  <div class="card"><div class="section-head"><h2>Electric tug vs diesel, by year</h2><span class="sub">tonnes CO₂ per TJ of engine work</span></div><div id="elec-chart" class="chart" style="height:240px"></div></div>
+  <details class="card more"><summary>Full lifecycle breakdown, tonnes CO₂e per year</summary><div class="table-wrap" style="padding-top:10px"><table id="fuel-table"><thead><tr><th>Option</th><th class="r">Total t</th><th class="r">Making it</th><th class="r">CO₂</th><th class="r">Methane</th><th class="r">N₂O</th><th class="r">Pilot fuel</th><th class="r">vs diesel</th><th class="r">Funnel-only</th><th>Confidence</th></tr></thead><tbody></tbody></table></div></details>
+</main>
+
+<!-- CALCULATOR -->
+<main class="page view" id="view-calc" hidden>
+  <div class="page-head"><div><h1>Fuel calculator</h1><p>Pick a ship and a speed. See how much fuel it burns and what slowing down saves.</p></div></div>
+  <div class="card">
+    <div class="grid g4">
+      <label class="field">Ship type<select id="calc-class" class="input"></select></label>
+      <label class="field">Efficiency certificate (EEDI / EIV)<input id="calc-design" type="number" min="0.5" step="0.1" value="5.2" placeholder="unknown" class="input"></label>
+      <label class="field">Fuel<select id="calc-fuel" class="input"></select></label>
+      <label class="field"><span>Speed <b style="color:var(--p-700)" id="calc-speed-label">14.0 kn</b></span><input id="calc-speed" type="range" min="4" max="18" step="0.5" value="14" style="margin-top:10px"></label>
+    </div>
+    <div class="err" id="calc-error" hidden></div>
+  </div>
+  <div class="grid g-calc">
+    <div class="card" id="calc-answer"></div>
+    <div class="card"><div class="section-head"><h2>Fuel per 1,000 nautical miles</h2><span class="sub" id="calc-sub"></span></div><div id="calc-chart" class="chart" style="height:310px"></div></div>
+  </div>
+  <div class="note" id="calc-provenance"></div>
+</main>
+
+<!-- PORTS -->
+<main class="page view" id="view-ports" hidden>
+  <div class="page-head"><div><h1>Ports</h1><p>What each port can supply in the chosen year.</p></div>
+    <label class="field" style="width:140px">Year<select id="ports-year" class="input"><option>2024</option><option selected>2030</option><option>2040</option><option>2047</option></select></label></div>
+  <section class="strip" id="ports-kpis"></section>
+  <div class="card">
+    <div class="legend"><span><i class="avail av-available">Yes</i> available</span><span><i class="avail av-limited">Limited</i> some supply</span><span><i class="avail av-planned">Planned</i> announced</span><span><i class="avail av-none">No</i> none</span></div>
+    <div class="table-wrap"><table id="ports-table"><thead></thead><tbody></tbody></table></div>
+    <div class="note" style="background:var(--p-50);border-color:var(--p-100)" id="ports-note"></div>
+  </div>
+  <div class="card"><div class="section-head"><h2>Grid carbon intensity</h2><span class="sub">tonnes CO₂ per MWh; dark points are measured, the rest projected</span></div><div id="grid-chart" class="chart" style="height:240px"></div></div>
+</main>
+
+<!-- HOW IT WORKS -->
+<main class="page view" id="view-tech" hidden>
+  <div class="page-head"><div><h1>How it works</h1><p>Three engines work together. Every number in Q Fleet comes from one of them.</p></div></div>
+  <div class="grid g3">
+    <div class="card how"><span class="step-n">1</span><h3>Predict fuel use</h3><p id="how-1">A machine learning model trained on real ship fuel reports predicts how much energy each ship needs at each speed.</p></div>
+    <div class="card how"><span class="step-n">2</span><h3>Count real emissions</h3><p>Every fuel is counted from well to wake: making it, shipping it, methane slip, N₂O and pilot fuel, not just the funnel.</p></div>
+    <div class="card how"><span class="step-n">3</span><h3>Search for the best plans</h3><p>A quantum-inspired search (QIEA + QPSO) tries fuel, route and speed for every ship and keeps the plans where cost and CO₂ cannot both improve.</p></div>
+  </div>
+  <div class="section-head"><h2>How accurate the fuel model is</h2></div>
+  <section class="strip" id="model-kpis"></section>
+  <div class="section-head"><h2>Last search</h2><span class="sub" id="tech-sub">Run a plan to see search details.</span><button class="btn btn-ghost btn-sm push" id="run-compare">Run comparison with NSGA-II, QBHO and greedy</button></div>
+  <section class="strip" id="tech-kpis"></section>
+  <div class="grid" id="tech-charts" hidden>
+    <div class="card"><h2>Search progress</h2><div id="progress-chart" class="chart" style="height:240px"></div></div>
+    <div class="card" id="methods-card"><h2>Hypervolume vs other methods</h2><span class="sub">Bigger means a better set of plans.</span><div id="methods-chart" class="chart" style="height:220px"></div></div>
+  </div>
+  <div class="note" id="provenance" hidden></div>
+</main>
+
+<footer class="foot"><div class="foot-in"><span>Q Fleet · SIH 2026, PS SIH26138</span><span id="foot-model"></span><span class="push">Fleets shown are representative examples, not a real operator's data.</span></div></footer>
 
 <dialog id="editor-dialog">
-  <div class="mb-2.5 flex items-center justify-between"><h2 class="font-display text-lg font-semibold">Ships &amp; routes</h2><button class="btn-primary !flex-none px-3.5 py-1.5 text-[13px]" id="editor-done">Done</button></div>
-  <div class="h3 mt-3 mb-1.5">Ships</div>
-  <div class="overflow-x-auto"><table class="editor-table w-full border-collapse" id="vessel-table"><thead><tr><th>Name</th><th>Type</th><th>Capacity t</th><th>EEDI/EIV</th><th>Min kn</th><th>Max kn</th><th>Tank m³</th><th>Cost ₹/yr</th><th>Hours/yr</th><th></th></tr></thead><tbody></tbody></table></div>
-  <button class="btn-ghost-sm mt-2" id="add-vessel">+ Ship</button>
-  <div class="h3 mt-4 mb-1.5">Routes</div>
-  <div class="overflow-x-auto"><table class="editor-table w-full border-collapse" id="route-table"><thead><tr><th>Name</th><th>From</th><th>To</th><th>Distance nmi</th><th>Cargo t/yr</th><th>Max hours</th><th></th></tr></thead><tbody></tbody></table></div>
-  <button class="btn-ghost-sm mt-2" id="add-route">+ Route</button>
+  <div class="section-head" style="justify-content:space-between"><h2>Ships &amp; routes</h2><button class="btn btn-sm" id="editor-done">Done</button></div>
+  <div class="group-t" style="margin:14px 0 6px">Ships</div>
+  <div class="table-wrap"><table class="editor-table" id="vessel-table"><thead><tr><th>Name</th><th>Type</th><th>Capacity t</th><th>EEDI/EIV</th><th>Min kn</th><th>Max kn</th><th>Tank m³</th><th>Cost ₹/yr</th><th>Hours/yr</th><th></th></tr></thead><tbody></tbody></table></div>
+  <button class="btn btn-ghost btn-sm" style="margin-top:8px" id="add-vessel">+ Ship</button>
+  <div class="group-t" style="margin:16px 0 6px">Routes</div>
+  <div class="table-wrap"><table class="editor-table" id="route-table"><thead><tr><th>Name</th><th>From</th><th>To</th><th>Distance nmi</th><th>Cargo t/yr</th><th>Max hours</th><th></th></tr></thead><tbody></tbody></table></div>
+  <button class="btn btn-ghost btn-sm" style="margin-top:8px" id="add-route">+ Route</button>
 </dialog>
 <script src="/vendor/plotly.min.js"></script>
 <script src="/static/app.js"></script>

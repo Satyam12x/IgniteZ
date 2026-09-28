@@ -8,7 +8,7 @@ still run the unit suite. To enable::
 These tests assert the properties that must survive contact with real data, and
 several of them encode findings that came *from* the data - the published
 "Division by zero!" strings, implied CO2 factors above the physical maximum, and
-the schema rename across reporting periods (docs/FINDINGS_PHASE1.md).
+the schema rename across reporting periods.
 """
 
 from __future__ import annotations

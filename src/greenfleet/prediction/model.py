@@ -3,8 +3,7 @@
 Architecture, and why it is this way
 ------------------------------------
 MRV cannot identify the speed-fuel relationship, because the reconstructed speed
-and the reconstructed consumption share a measured column (docs/FINDINGS_PHASE1.md
-section 2). Trying to fit the speed exponent returns ~1 instead of 3 and would give
+and the reconstructed consumption share a measured column. Trying to fit the speed exponent returns ~1 instead of 3 and would give
 the optimizer a slow-steaming sensitivity that is wrong by roughly 3x.
 
 So the two halves come from different places:

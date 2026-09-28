@@ -18,6 +18,7 @@ from greenfleet.optimize.baselines import (
     greedy_fleet,
     milp_fleet,
     nsga2_fleet,
+    qbho_fleet,
     random_search_fleet,
 )
 from greenfleet.optimize.encoding import FleetEncoding
@@ -466,9 +467,32 @@ class TestBaselines:
             random_search_fleet(tiny, n_evaluations=300, seed=1),
             greedy_fleet(tiny, seed=1),
             nsga2_fleet(tiny, n_evaluations=300, seed=1),
+            qbho_fleet(tiny, n_evaluations=300, seed=1),
         ):
             assert result.front.ndim == 2
             assert all(s.feasible for s in result.archive)
+
+    def test_qbho_is_a_real_baseline(self, tiny):
+        """B-04: the sponsor's method family, run fairly - deterministic, budgeted,
+        non-dominated, and not a strawman (it must beat random search on the tiny
+        instance at equal budget)."""
+        from greenfleet.optimize.pareto import hypervolume, reference_point
+
+        a = qbho_fleet(tiny, n_evaluations=600, seed=3)
+        b = qbho_fleet(tiny, n_evaluations=600, seed=3)
+        np.testing.assert_allclose(a.front, b.front)
+        assert a.n_evaluations == 600
+        assert a.algorithm == "qbho"
+        assert len(a.archive) <= 60
+        objectives = a.front
+        for i in range(len(objectives)):
+            for j in range(len(objectives)):
+                if i != j:
+                    assert not (np.all(objectives[j] <= objectives[i])
+                                and np.any(objectives[j] < objectives[i]))
+        r = random_search_fleet(tiny, n_evaluations=600, seed=3)
+        ref = reference_point([a.front, r.front])
+        assert hypervolume(a.front, ref) >= hypervolume(r.front, ref)
 
     def test_baselines_evaluate_the_same_problem(self, tiny):
         """B-01: a benchmark where methods solve different problems proves nothing."""

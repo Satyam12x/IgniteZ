@@ -149,7 +149,8 @@ def test_electrification_series(client):
 
 def test_optimise_tiny_returns_feasible_plans_with_provenance(client):
     r = client.post("/api/optimise", json={"scenario": "tiny", "n_individuals": 8,
-                                           "n_generations": 20, "compare_with": ["greedy"]})
+                                           "n_generations": 20,
+                                           "compare_with": ["greedy", "qbho"]})
     assert r.status_code == 202, r.text
     status = wait_for(client, r.json()["job_id"])
     assert status["status"] == "done", status.get("error")
@@ -164,7 +165,8 @@ def test_optimise_tiny_returns_feasible_plans_with_provenance(client):
     assert set(result["extremes"]) == {"least_energy", "cleanest", "cheapest", "balanced"}
     cheapest = result["plans"][result["extremes"]["cheapest"]]
     assert cheapest["cost_inr"] == min(p["cost_inr"] for p in result["plans"])
-    assert result["baselines"][0]["algorithm"] == "greedy"
+    assert [b["algorithm"] for b in result["baselines"]] == ["greedy", "qbho"]
+    assert result["baselines"][1]["n_evaluations"] == 160    # equal budget (B-01)
     assert result["hypervolume"] > 0
     assert result["problem"]["year"] == 2030
     assert "energy_source" in result
@@ -237,7 +239,7 @@ def test_unknown_job_is_404(client):
 def test_dashboard_and_vendor_bundle_are_served(client):
     index = client.get("/")
     assert index.status_code == 200
-    assert "Green Fleet Planner" in index.text
+    assert "Q Fleet" in index.text
     assert client.get("/static/app.js").status_code == 200
     plotly = client.get("/vendor/plotly.min.js")
     assert plotly.status_code == 200
