@@ -18,7 +18,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from greenfleet import __version__
-from greenfleet.api import schemas, service
+from greenfleet.api import keepalive, schemas, service
 from greenfleet.api.jobs import JobStore
 from greenfleet.api.state import AppState, load_state
 from greenfleet.optimize.problem import Infeasible
@@ -48,7 +48,10 @@ def create_app(state: AppState | None = None) -> FastAPI:
         app.state.engines = state or load_state()
         app.state.jobs = JobStore()
         logger.info("energy source: %s", app.state.engines.energy_source)
+        pinger = keepalive.start_from_env()
         yield
+        if pinger is not None:
+            pinger.stop()
 
     app = FastAPI(
         title="Q Fleet",

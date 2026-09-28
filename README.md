@@ -48,6 +48,22 @@ python -m greenfleet.api
 Open http://127.0.0.1:8000. The interactive API reference is at http://127.0.0.1:8000/docs.
 Use `--port` to pick another port and `--host 0.0.0.0` to serve on a network.
 
+## Deploying on Render
+
+Create a Web Service from the repository with:
+
+| Setting | Value |
+|---|---|
+| Build command | `pip install -e ".[api,optim]"` |
+| Start command | `uvicorn greenfleet.api.app:app --host 0.0.0.0 --port $PORT` |
+| Environment | `PYTHON_VERSION=3.10.11` |
+| Health check path | `/api/health` |
+
+Free Render services sleep after about 15 minutes without traffic. Q Fleet keeps itself
+awake: when `RENDER_EXTERNAL_URL` is set (Render sets it automatically), the app requests its
+own `/api/health` through the public URL every 10 minutes. Set `QFLEET_KEEPALIVE=0` to turn
+this off, or `QFLEET_KEEPALIVE_INTERVAL_S` to change the interval.
+
 ## Dashboard
 
 | Page | What it shows |
@@ -79,8 +95,8 @@ HTTP 422 with the engine's explanation.
 
 ```bash
 uv pip install -e ".[dev,api,optim]"
-pytest -m "not slow"               # 381 tests, about 30 seconds
-pytest                             # all 416, includes benchmarks and raw-data integration tests
+pytest -m "not slow"               # 393 tests, about 30 seconds
+pytest                             # all 428, includes benchmarks and raw-data integration tests
 ```
 
 The integration tests need the raw data (see below).
